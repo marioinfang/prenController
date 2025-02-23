@@ -1,39 +1,36 @@
 from detection.path_analyzer import PathAnalyzer
-from picamera import PiCamera
-import time
 import cv2
-import numpy as np
 
-# YOLO-Modell initialisieren
 path_analyzer = PathAnalyzer('detection/model/best.onnx')
 
-# Kamera initialisieren
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.start_preview()
-time.sleep(2)
+cap = cv2.VideoCapture(0)  # Oder den Index deiner Kamera
+
+if not cap.isOpened():
+    print("Kamera konnte nicht geöffnet werden.")
+    exit()
 
 try:
     while True:
-        # Bild erfassen
-        img = np.empty((480, 640, 3), dtype=np.uint8)
-        camera.capture(img, 'bgr')
+        ret, frame = cap.read()
+        if not ret:
+            print("Kein Frame gelesen.")
+            break
 
-        # Objekterkennung durchführen
-        path_clear = path_analyzer.is_path_clear(img)
+        path_clear = path_analyzer.is_path_clear(frame) # Übergabe des frames an die is_path_clear funktion
 
-        # Ergebnisse ausgeben
         if path_clear:
             print('Weg befahrbar')
         else:
             print('Weg NICHT befahrbar')
 
-        # Optionale Pause (z.B. zur Steuerung der Framerate)
-        time.sleep(0.1)  # Wartezeit in Sekunden
+        # Optionale Anzeige des Bildes (zur Überprüfung)
+        # cv2.imshow('Kamerabild', frame)
+        # if cv2.waitKey(1) & 0xFF == ord('q'): # Mit 'q' beenden
+        #     break
 
 except KeyboardInterrupt:
-    print('Schleife beendet')
+    print("Schleife beendet")
 
 finally:
-    camera.stop_preview()
-    camera.close()
+    cap.release()
+    cv2.destroyAllWindows()
