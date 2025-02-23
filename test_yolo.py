@@ -1,36 +1,39 @@
-from detection.path_analyzer import PathAnalyzer
+from libcamera import controls, encoders, Frame, Pipeline, preview
 import cv2
+import numpy as np
 
-path_analyzer = PathAnalyzer('detection/model/best.onnx')
+# ... (YOLO-Modell initialisieren) ...
 
-cap = cv2.VideoCapture(0)  # Oder den Index deiner Kamera
+pipeline = Pipeline()
+camera = pipeline.add_camera()
 
-if not cap.isOpened():
-    print("Kamera konnte nicht geöffnet werden.")
-    exit()
+# Konfiguration der Kamera (Auflösung, Framerate, etc.)
+camera.controls.ExposureTime = 10000  # Beispiel
+camera.controls.AnalogueGain = 1.0  # Beispiel
+
+# Encoder erstellen (für die Verarbeitung der Frames)
+encoder = encoders.JpegEncoder()
+pipeline.add_encoder(encoder)
+
+# Pipeline starten
+pipeline.start()
 
 try:
     while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("Kein Frame gelesen.")
-            break
+        # Frame erfassen
+        frame = pipeline.wait_frame()
 
-        path_clear = path_analyzer.is_path_clear(frame) # Übergabe des frames an die is_path_clear funktion
+        # Frame in ein Numpy-Array konvertieren (Beispiel)
+        image = np.array(frame.array).reshape((frame.height, frame.width, 3))
 
-        if path_clear:
-            print('Weg befahrbar')
-        else:
-            print('Weg NICHT befahrbar')
+        # Bildverarbeitung mit YOLO
+        path_clear = path_analyzer.is_path_clear(image)
 
-        # Optionale Anzeige des Bildes (zur Überprüfung)
-        # cv2.imshow('Kamerabild', frame)
-        # if cv2.waitKey(1) & 0xFF == ord('q'): # Mit 'q' beenden
-        #     break
+        # ... (Ergebnisse ausgeben) ...
 
 except KeyboardInterrupt:
     print("Schleife beendet")
 
 finally:
-    cap.release()
-    cv2.destroyAllWindows()
+    pipeline.stop()
+    pipeline.close()
