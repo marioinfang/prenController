@@ -1,6 +1,5 @@
 import time
 from states import State
-from communication.uart_handler import UARThandler
 
 class CarStateMachine:
     def __init__(self, uart):

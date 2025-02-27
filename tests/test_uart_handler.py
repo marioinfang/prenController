@@ -26,7 +26,7 @@ class TestUARTHandler(TestCase):
 
         uart = UARTHandler("/dev/serial0")
         uart.connect()
-        uart.send_data("Test Message")
+        uart.send("Test Message")
 
         mock_serial_instance.write.assert_called_with(b"Test Message")
 
@@ -38,7 +38,7 @@ class TestUARTHandler(TestCase):
         uart = UARTHandler("/dev/serial0")
         uart.connect()
         with self.assertRaises(ConnectionError) as context:
-            uart.send_data("Test Message")
+            uart.send("Test Message")
         self.assertIn("UART connection is not open!", str(context.exception))
 
     @patch("serial.Serial")
@@ -49,7 +49,7 @@ class TestUARTHandler(TestCase):
 
         uart = UARTHandler("/dev/serial0")
         uart.connect()
-        data = uart.receive_data()
+        data = uart.receive()
 
         self.assertEqual(data, "Received Data")
 
@@ -61,7 +61,7 @@ class TestUARTHandler(TestCase):
         uart = UARTHandler("/dev/serial0")
         uart.connect()
         with self.assertRaises(ConnectionError) as context:
-            uart.receive_data()
+            uart.receive()
         self.assertIn("UART connection is not open!", str(context.exception))
 
     @patch("serial.Serial")
