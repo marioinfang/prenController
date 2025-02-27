@@ -1,24 +1,45 @@
 import serial
+import time
 
-class UARThandler:
-    def __init__(self, port='/dev/serial0', baudrate=115200):
-        """Initialisiert die UART-Schnittstelle"""
-        self.ser = serial.Serial(port, baudrate, timeout=1)
+class UARTHandler:
+    def __init__(self, port: str, baudrate: int = 115200, timeout: float = 1):
+        self.port = port
+        self.baudrate = baudrate
+        self.timeout = timeout
+        self.serial_conn = None
 
-    def send(self, command):
-        """Sendet einen Befehl an den STM32"""
-        if self.ser.is_open:
-            self.ser.write(command.encode())
-            print(f"[UART] Senden → STM32: {command}")
+    def connect(self):
+        try:
+            self.serial_conn = serial.Serial(
+                port=self.port,
+                baudrate=self.baudrate,
+                timeout=self.timeout
+            )
+            time.sleep(2)
+        except serial.SerialException as e:
+            raise ConnectionError(f"Failed to connect to UART: {e}")
 
-    def receive(self):
-        """Empfängt Daten vom STM32"""
-        if self.ser.in_waiting > 0:
-            response = self.ser.readline().decode().strip()
-            print(f"[UART] Empfangen ← STM32: {response}")
-            return response
-        return None
+    def send_data(self, data: str):
+        if not self.serial_conn or not self.serial_conn.is_open:
+            raise ConnectionError("UART connection is not open!")
+        try:
+            self.serial_conn.write(data.encode('utf-8'))
+            self.serial_conn.flush()
+        except serial.SerialException as e:
+            raise ConnectionError(f"Failed to send data: {e}")
+
+    def receive_data(self) -> str:
+        if not self.serial_conn or not self.serial_conn.is_open:
+            raise ConnectionError("UART connection is not open!")
+        try:
+            received_data = self.serial_conn.readline().decode('utf-8').strip()
+            return received_data
+        except serial.SerialException as e:
+            raise ConnectionError(f"Failed to receive data: {e}")
 
     def close(self):
-        """Schließt die UART-Verbindung"""
-        self.ser.close()
+        if self.serial_conn and self.serial_conn.is_open:
+            try:
+                self.serial_conn.close()
+            except serial.SerialException as e:
+                raise ConnectionError(f"Failed to close UART connection: {e}")
