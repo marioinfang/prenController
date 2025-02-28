@@ -4,7 +4,7 @@
 #define TX_PIN 17  // UART TX Pin
 #define BAUD_RATE 115200
 
-HardwareSerial uart(2); // UART2 Instanz
+HardwareSerial uart(2);
 
 void setup() {
     Serial.begin(BAUD_RATE);
@@ -21,17 +21,20 @@ void loop() {
         Serial.println(command);
 
         if (command == "WEG_BEFAHREN") {
+            delay(random(500, 4000));
             uart.println("WEGPUNKT_ERREICHT");
         } 
         else if (command == "WEGPUNKT_ANALYSIEREN") {
+            delay(random(500, 4000));
             uart.println("ZIEL_ERKANNT");
         } 
         else if (command == "ZIEL_IDENTIFIZIEREN") {
+            delay(random(500, 4000));
             uart.println("HINDERNIS_GEFUNDEN");
         } 
         else if (command == "HINDERNIS_ANHEBEN") {
             uart.println("HEBEN");
-            delay(2000); // 2 Sekunden warten
+            delay(random(500, 4000));
             uart.println("HEBEN_FERTIG");
         } 
         else {
