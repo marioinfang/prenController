@@ -4,6 +4,7 @@ class PathAnalyzer:
     def __init__(self, model_path):
         self.yolo_detector = YoloDetector(model_path)
         self.object_names = self.yolo_detector.model.names
+        print(self.object_names)
 
     def is_path_clear(self, img):
         return_value = True
