@@ -23,6 +23,7 @@ class UARTHandler:
         if not self.serial_conn or not self.serial_conn.is_open:
             raise ConnectionError("UART connection is not open!")
         try:
+            print("send: " + data)
             self.serial_conn.write(data.encode('utf-8'))
             self.serial_conn.flush()
         except serial.SerialException as e:
@@ -33,6 +34,7 @@ class UARTHandler:
             raise ConnectionError("UART connection is not open!")
         try:
             received_data = self.serial_conn.readline().decode('utf-8').strip()
+            print("received: "+ received_data)
             return received_data
         except serial.SerialException as e:
             raise ConnectionError(f"Failed to receive data: {e}")
