@@ -4,6 +4,7 @@ from states import State
 class CarStateMachine:
     def __init__(self, uart):
         """Initialisiert die State Machine mit einer UART-Schnittstelle"""
+        uart.connect()
         self.uart = uart
         self.state = State.INIT
 
