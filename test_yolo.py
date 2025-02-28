@@ -1,39 +1,35 @@
-from libcamera import controls, encoders, Frame, Pipeline, preview
+from picamera2 import Picamera2
+from detection.path_analyzer import PathAnalyzer
 import cv2
 import numpy as np
 
-# ... (YOLO-Modell initialisieren) ...
+# YOLO-Modell initialisieren
+path_analyzer = PathAnalyzer('detection/model/best.onnx')
 
-pipeline = Pipeline()
-camera = pipeline.add_camera()
+picam2 = Picamera2()
 
 # Konfiguration der Kamera (Auflösung, Framerate, etc.)
-camera.controls.ExposureTime = 10000  # Beispiel
-camera.controls.AnalogueGain = 1.0  # Beispiel
+config = picam2.create_still_configuration(main={"size": (640, 480)}) # Beispielauflösung
+picam2.configure(config)
 
-# Encoder erstellen (für die Verarbeitung der Frames)
-encoder = encoders.JpegEncoder()
-pipeline.add_encoder(encoder)
-
-# Pipeline starten
-pipeline.start()
+picam2.start()
 
 try:
     while True:
         # Frame erfassen
-        frame = pipeline.wait_frame()
-
-        # Frame in ein Numpy-Array konvertieren (Beispiel)
-        image = np.array(frame.array).reshape((frame.height, frame.width, 3))
+        array = picam2.capture_array()
 
         # Bildverarbeitung mit YOLO
-        path_clear = path_analyzer.is_path_clear(image)
+        path_clear = path_analyzer.analyze_path(array)
 
         # ... (Ergebnisse ausgeben) ...
+        if (path_clear):
+            print("Weg befahren")
+        else:
+            print("Gesperrt")
 
 except KeyboardInterrupt:
     print("Schleife beendet")
 
 finally:
-    pipeline.stop()
-    pipeline.close()
+    picam2.stop()
