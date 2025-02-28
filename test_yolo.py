@@ -20,7 +20,7 @@ try:
         array = picam2.capture_array()
 
         # Bildverarbeitung mit YOLO
-        path_clear = path_analyzer.analyze_path(array)
+        path_clear = path_analyzer.is_path_clear(array)
 
         # ... (Ergebnisse ausgeben) ...
         if (path_clear):
