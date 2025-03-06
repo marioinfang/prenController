@@ -19,8 +19,10 @@ try:
         # Frame erfassen
         array = picam2.capture_array()
 
+        resized = cv2.resize(array, (640, 640), interpolation=cv2.INTER_LINEAR)
+
         # Bildverarbeitung mit YOLO
-        path_clear = path_analyzer.is_path_clear(array)
+        path_clear = path_analyzer.is_path_clear(resized)
 
         # ... (Ergebnisse ausgeben) ...
         if (path_clear):
