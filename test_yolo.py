@@ -1,7 +1,9 @@
 from picamera2 import Picamera2
 from detection.path_analyzer import PathAnalyzer
+from datetime import datetime
 import cv2
 import numpy as np
+import os
 
 # YOLO-Modell initialisieren
 path_analyzer = PathAnalyzer('detection/model/best.onnx')
@@ -21,17 +23,25 @@ try:
 
         resized = cv2.resize(array, (640, 640), interpolation=cv2.INTER_LINEAR)
 
+        # Farbraumkonvertierung von BGR nach RGB
+        rgb_array = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+
+        # Bild speichern tests
+        #timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        #file_path = os.path.join('/home/minfang/Car/imgArchive', f"capture_{timestamp}.jpg")
+        #cv2.imwrite(file_path, rgb_array)
+
         # Bildverarbeitung mit YOLO
-        path_clear = path_analyzer.is_path_clear(resized)
+        cone_on_path, barrier_on_path, distances = path_analyzer.analyze_path(rgb_array)
 
         # ... (Ergebnisse ausgeben) ...
-        if (path_clear):
-            print("Weg befahren")
+        if (cone_on_path):
+            print("Search other path")
         else:
-            print("Gesperrt")
+            print("Take this path")
 
 except KeyboardInterrupt:
-    print("Schleife beendet")
+    print("End loop")
 
 finally:
     picam2.stop()
