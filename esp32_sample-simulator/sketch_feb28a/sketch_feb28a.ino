@@ -25,8 +25,8 @@ void loop() {
             uart.println("ack");
         }
         else if (command == "FAHRE_WEITER") {
-            bool randomizedNumb = random(0, 1);
-            if (randomizedNumb) {
+            int randomValue = random(2);
+            if (randomValue) {
                 uart.println("WEGPUNKT_ERREICHT");
             } else {
                 uart.println("ack");
@@ -34,16 +34,16 @@ void loop() {
         }
         else if (command == "WEG_BEFAHREN") {
             delay(random(500, 4000));
-             bool randomizedNumb = random(0, 2);
-            if (randomizedNumb == 0) {
+            int randomValue = random(3);
+            if (randomValue == 0) {
                 uart.println("AUSRICHTUNG_NOTWENDIG");
-            } else if(randomizedNumb == 1){
+            } else if(randomValue == 1){
                 uart.println("ZIEL_ERKANNT");
             } else {
                 uart.println("ack");
             }
         }
-        else if (command == "WEGPUNKT_ANALYSIEREN") {
+        else if (command == "ANALYSIERE_WEGPUNKT") {
             delay(random(500, 4000));
             uart.println("ZIEL_ERKANNT");
         } 
@@ -57,8 +57,8 @@ void loop() {
             uart.println("HEBEN_FERTIG");
         }
         else if (command == "IDENTIFIZIERE_ZIEL"){
-            bool randomizedNumb = random(0, 1);
-            if (randomizedNumb) {
+            int randomValue = random(2);
+            if (randomValue) {
                 uart.println("HINDERNIS_GEFUNDEN");
             } else {
                 uart.println("ack");
