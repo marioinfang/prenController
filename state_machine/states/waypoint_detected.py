@@ -1,4 +1,5 @@
 from .base_state import BaseState
+from .decision_state import Decision
 
 class WaypointDetected(BaseState):
     def __init__(self, machine):
@@ -7,9 +8,11 @@ class WaypointDetected(BaseState):
     def context(self):
         print("State: WaypointDetected")
 
-        decision = True
+        "missing logic"
 
-        if decision == True:
+        decision = Decision.WAYPOINT_REACHED
+
+        if decision == Decision.WAYPOINT_REACHED:
             from .waypoint_reached import WaypointReached
             self.machine.set_state(WaypointReached(self.machine))
         else:

@@ -1,4 +1,5 @@
 from .base_state import BaseState
+from .decision_state import Decision
 
 class Idle(BaseState):
     def __init__(self, machine):
@@ -7,9 +8,11 @@ class Idle(BaseState):
     def context(self):
         print("State: Idle")
 
-        decision = True
+        "missing logic"
 
-        if decision:
+        decision = Decision.START
+
+        if decision == Decision.START:
             from .start import Start
             self.machine.set_state(Start(self.machine))
         else:

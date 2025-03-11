@@ -1,4 +1,5 @@
 from .base_state import BaseState
+from .decision_state import Decision
 
 class FollowLine(BaseState):
     def __init__(self, machine):
@@ -7,15 +8,17 @@ class FollowLine(BaseState):
     def context(self):
         print("State: FollowLine")
 
-        decision = 1
+        "missing logic"
 
-        if decision == 1:
+        decision = Decision.WAYPOINT_DETECTED
+
+        if decision == Decision.BARRIER_DETECTED:
             from .waypoint_detected import WaypointDetected
             self.machine.set_state(WaypointDetected(self.machine))
-        elif decision == 2:
+        elif decision == Decision.BARRIER_DETECTED:
             from .barrier_detected import BarrierDetected
             self.machine.set_state(BarrierDetected(self.machine))
-        elif decision == 3:
+        elif decision == Decision.CONE_DETECTED:
             from .cone_detected import ConeDetected
             self.machine.set_state(ConeDetected(self.machine))
         else:

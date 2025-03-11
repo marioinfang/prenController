@@ -1,4 +1,5 @@
 from .base_state import BaseState
+from .decision_state import Decision
 
 class FinishLineReached(BaseState):
     def __init__(self, machine):
@@ -7,8 +8,10 @@ class FinishLineReached(BaseState):
     def context(self):
         print("State: FinishLineReached")
 
-        decision = True
+        "missing logic"
 
-        if decision:
+        decision = Decision.ERROR
+
+        if decision == Decision.ERROR:
             from .error import Error
             self.machine.set_state(Error(self.machine))

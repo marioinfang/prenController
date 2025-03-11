@@ -1,4 +1,5 @@
 from .base_state import BaseState
+from .decision_state import Decision
 
 class Start(BaseState):
 
@@ -8,9 +9,11 @@ class Start(BaseState):
     def context(self):
         print("State: Start")
 
-        decision = True
+        "missing logic"
 
-        if decision == True:
+        decision = Decision.FOLLOW_LINE
+
+        if decision == Decision.FOLLOW_LINE:
             from .follow_line import FollowLine
             self.machine.set_state(FollowLine(self.machine))
         else:

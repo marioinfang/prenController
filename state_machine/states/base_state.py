@@ -6,4 +6,5 @@ class BaseState(ABC):
 
     @abstractmethod
     def context(self):
+        "Implementation of the logic of the state"
         pass

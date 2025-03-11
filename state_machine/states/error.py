@@ -6,3 +6,5 @@ class Error(BaseState):
 
     def context(self):
         print("State: Error")
+
+        "missing logic"

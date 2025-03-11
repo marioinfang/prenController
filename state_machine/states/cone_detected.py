@@ -1,4 +1,5 @@
 from .base_state import BaseState
+from .decision_state import Decision
 
 class ConeDetected(BaseState):
     def __init__(self, machine):
@@ -7,9 +8,11 @@ class ConeDetected(BaseState):
     def context(self):
         print("State: ConeDetected")
 
-        decision = True
+        "missing logic"
 
-        if decision:
+        decision = Decision.FOLLOW_LINE
+
+        if decision == Decision.FOLLOW_LINE:
             from .follow_line import FollowLine
             self.machine.set_state(FollowLine(self.machine))
         else:

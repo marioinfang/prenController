@@ -1,4 +1,5 @@
 from .base_state import BaseState
+from .decision_state import Decision
 
 class WaypointReached(BaseState):
     def __init__(self, machine):
@@ -7,12 +8,14 @@ class WaypointReached(BaseState):
     def context(self):
         print("State: WaypointReached")
 
-        decision = 1
+        "missing logic"
 
-        if decision == 1:
+        decision = Decision.FINISH_LINE_REACHED
+
+        if decision == Decision.FINISH_LINE_REACHED:
             from .finish_line_reached import FinishLineReached
             self.machine.set_state(FinishLineReached(self.machine))
-        elif decision == 2:
+        elif decision == Decision.FOLLOW_LINE:
             from .follow_line import FollowLine
             self.machine.set_state(FollowLine(self.machine))
         else:
