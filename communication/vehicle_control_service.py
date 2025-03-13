@@ -6,7 +6,7 @@ from .uart_service import UARTService
 
 logger = get_logger(__name__)
 
-class CarService:
+class VehicleControlService:
     def __init__(self):
         self.uart_service = UARTService()
 

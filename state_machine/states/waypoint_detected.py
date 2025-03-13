@@ -1,6 +1,6 @@
 import random
 
-from communication.car_service import CarService
+from communication.vehicle_control_service import VehicleControlService
 from communication.types.detection_type import StopTypes
 from utils.log_config import get_logger
 from .base_state import BaseState
@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 class WaypointDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
-        self.car_service = CarService()
+        self.car_service = VehicleControlService()
 
     def context(self):
         logger.info("Entered State: WaypointDetected")

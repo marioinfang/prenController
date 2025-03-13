@@ -1,6 +1,6 @@
 import random
 
-from communication.car_service import CarService
+from communication.vehicle_control_service import VehicleControlService
 from utils.log_config import get_logger
 from .base_state import BaseState
 from state_machine.types.decision_state import Decision
@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 class FollowLine(BaseState):
     def __init__(self, machine):
         self.machine = machine
-        self.car_service = CarService()  # Inject CarService
+        self.car_service = VehicleControlService()  # Inject CarService
 
     def context(self):
         logger.info("Entered State: FollowLine")
