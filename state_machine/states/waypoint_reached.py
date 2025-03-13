@@ -1,3 +1,5 @@
+import random
+
 from utils.log_config import get_logger
 from .base_state import BaseState
 from state_machine.types.decision_state import Decision
@@ -14,7 +16,7 @@ class WaypointReached(BaseState):
 
         "missing logic"
 
-        decision = Decision.FINISH_LINE_REACHED
+        decision = self.get_decision()
 
         if decision == Decision.FINISH_LINE_REACHED:
             from .finish_line_reached import FinishLineReached
@@ -25,3 +27,14 @@ class WaypointReached(BaseState):
         else:
             from .error import Error
             self.machine.set_state(Error(self.machine))
+
+
+    def get_decision(self):
+        """
+        Placeholder for real decision-making logic.
+        If not overridden in tests, use random decision.
+        """
+        return random.choice([
+            Decision.FINISH_LINE_REACHED,
+            Decision.FOLLOW_LINE
+        ])

@@ -1,12 +1,26 @@
 import time
 from utils.log_config import get_logger
 from .mock_uart_handler import MockUARTHandler
+from .uart_handler import UARTHandler
 
 logger = get_logger(__name__)
 
+#TODO MAYBE use env var instead of this nasty workaround
+def is_raspberry_pi():
+    try:
+        with open("/proc/cpuinfo", "r") as f:
+            cpuinfo = f.read()
+        return "Raspberry Pi" in cpuinfo
+    except FileNotFoundError:
+        return False
+
+
 class UARTService:
     def __init__(self):
-        self.uart = MockUARTHandler.get_instance()
+        if is_raspberry_pi():
+            self.uart = UARTHandler()
+        else:
+            self.uart = MockUARTHandler.get_instance()
         self.uart.connect()
 
     def send(self, command: str, max_retries=3, ack_timeout=2.0):

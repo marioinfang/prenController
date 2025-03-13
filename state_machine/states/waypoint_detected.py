@@ -1,3 +1,5 @@
+import random
+
 from communication.car_service import CarService
 from communication.types.detection_type import StopTypes
 from utils.log_config import get_logger
@@ -28,6 +30,8 @@ class WaypointDetected(BaseState):
     def get_decision(self):
         """
         Placeholder for real decision-making logic.
-        Replace this with actual sensor input, AI processing, or UART responses.
+        If not overridden in tests, use random decision.
         """
-        return Decision.WAYPOINT_REACHED
+        return random.choice([
+            Decision.WAYPOINT_REACHED
+        ])
