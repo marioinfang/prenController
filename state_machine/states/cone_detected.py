@@ -14,7 +14,7 @@ class ConeDetected(BaseState):
 
 
     def context(self):
-        logger.info("State: ConeDetected")
+        logger.info("Entered State: ConeDetected")
         self.car_service.stop(state=Decision.CONE_DETECTED, reason=StopTypes.CONE)
 
         decision = self.get_decision()

@@ -10,7 +10,7 @@ class WaypointReached(BaseState):
         self.machine = machine
 
     def context(self):
-        logger.info("Entering State: WaypointReached")
+        logger.info("Entered State: WaypointReached")
 
         "missing logic"
 

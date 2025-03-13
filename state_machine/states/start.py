@@ -11,7 +11,7 @@ class Start(BaseState):
         self.machine = machine
 
     def context(self):
-        logger.info("Entering State: Start")
+        logger.info("Entered State: Start")
         # TODO add logic when destination selected and start button pressed pressed
 
         decision = Decision.FOLLOW_LINE

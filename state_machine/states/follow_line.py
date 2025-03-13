@@ -12,7 +12,7 @@ class FollowLine(BaseState):
         self.car_service = CarService()  # Inject CarService
 
     def context(self):
-        logger.info("Entering State: FollowLine")
+        logger.info("Entered State: FollowLine")
 
         self.car_service.drive(state=Decision.FOLLOW_LINE, blocked=False, distance=100)
 

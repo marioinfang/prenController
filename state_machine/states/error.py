@@ -7,6 +7,6 @@ class Error(BaseState):
         self.machine = machine
 
     def context(self):
-        logger.error("Entering State: Error")
+        logger.error("Entered State: Error")
 
         "missing logic"

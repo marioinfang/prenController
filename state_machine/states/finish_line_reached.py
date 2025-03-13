@@ -9,6 +9,6 @@ class FinishLineReached(BaseState):
         self.machine = machine
 
     def context(self):
-        logger.info("Entering State: FinishLineReached")
+        logger.info("Entered State: FinishLineReached")
 
         "missing logic"

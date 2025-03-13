@@ -14,7 +14,7 @@ class BarrierDetected(BaseState):
 
 
     def context(self):
-        logger.info("State: BarrierDetected")
+        logger.info("Entered State: BarrierDetected")
         self.car_service.stop(state=Decision.BARRIER_DETECTED, reason=StopTypes.OBSTACLE)
 
         decision = self.get_decision()

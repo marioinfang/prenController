@@ -10,7 +10,7 @@ class Idle(BaseState):
         self.machine = machine
 
     def context(self):
-        logger.info("Entering: Idle State")
+        logger.info("Entered: Idle State")
 
         "missing logic"
 

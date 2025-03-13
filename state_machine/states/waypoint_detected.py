@@ -13,7 +13,7 @@ class WaypointDetected(BaseState):
         self.car_service = CarService()
 
     def context(self):
-        logger.info("Entering State: WaypointDetected")
+        logger.info("Entered State: WaypointDetected")
         self.car_service.stop(state=Decision.WAYPOINT_DETECTED, reason=StopTypes.WAYPOINT)
 
         decision = self.get_decision()
