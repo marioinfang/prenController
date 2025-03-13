@@ -5,11 +5,20 @@ from utils.log_config import get_logger
 logger = get_logger(__name__)
 
 class UARTHandler:
-    def __init__(self, port: str, baudrate: int = 115200, timeout: float = 1):
+    _instance = None
+    def __init__(self, port: str = "/dev/serial0", baudrate: int = 115200, timeout: float = 2):
+        if UARTHandler._instance is not None:
+            raise Exception("Use get_instance() to access UARTHandler.")
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
         self.serial_conn = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = UARTHandler()
+        return cls._instance
 
     def connect(self):
         try:
