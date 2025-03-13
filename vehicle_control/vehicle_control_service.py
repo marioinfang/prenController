@@ -1,8 +1,8 @@
-from communication.types.detection_type import StopTypes
-from communication.types.direction_type import DirectionType
+from vehicle_control.types.detection_type import StopTypes
+from vehicle_control.types.direction_type import DirectionType
 from state_machine.types.decision_state import Decision
 from utils.log_config import get_logger
-from .uart_service import UARTService
+from communication.uart_service import UARTService
 
 logger = get_logger(__name__)
 

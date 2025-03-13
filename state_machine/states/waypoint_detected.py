@@ -1,7 +1,6 @@
 import random
 
-from communication.vehicle_control_service import VehicleControlService
-from communication.types.detection_type import StopTypes
+from vehicle_control.vehicle_control_service import VehicleControlService
 from utils.log_config import get_logger
 from .base_state import BaseState
 from state_machine.types.decision_state import Decision
