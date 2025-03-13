@@ -11,13 +11,22 @@ class VehicleControlService:
         self.uart_service = UARTService()
 
     def drive(self, state: Decision, blocked: bool, distance: int):
-        self.uart_service.send(f"drive({state},{blocked},{distance})")
+        self._send_command(f"drive({state},{blocked},{distance})")
 
     def stop(self, state: Decision, reason: StopTypes):
-        self.uart_service.send(f"stop({state},{reason})")
+        self._send_command(f"stop({state},{reason})")
 
     def drive_to_waypoint(self, state: Decision):
-        self.uart_service.send(f"drive_to_waypoint({state})")
+        self._send_command(f"drive_to_waypoint({state})")
 
     def rotate(self, state: Decision, direction: DirectionType, angle: int):
-        self.uart_service.send(f"rotate({state},{direction},{angle})")
+        self._send_command(f"rotate({state},{direction},{angle})")
+
+    def _send_command(self, command: str):
+        response = self.uart_service.send(command)
+        if self._is_error_response(response):
+            logger.error(f"Failed to send command -> response: {response}")
+
+    @staticmethod
+    def _is_error_response(response: str) -> bool:
+        return response.startswith("ERR")
