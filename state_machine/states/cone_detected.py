@@ -10,12 +10,12 @@ logger = get_logger(__name__)
 class ConeDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
-        self.car_service = VehicleControlService()
+        self.vehicle_control_service = VehicleControlService()
 
 
     def context(self):
         logger.info("Entered State: ConeDetected")
-        self.car_service.stop(state=Decision.CONE_DETECTED, reason=StopTypes.CONE)
+        self.vehicle_control_service.stop(state=Decision.CONE_DETECTED, reason=StopTypes.CONE)
 
         decision = self.get_decision()
 

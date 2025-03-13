@@ -11,12 +11,12 @@ logger = get_logger(__name__)
 class FollowLine(BaseState):
     def __init__(self, machine):
         self.machine = machine
-        self.car_service = VehicleControlService()  # Inject CarService
+        self.vehicle_control_service = VehicleControlService()
 
     def context(self):
         logger.info("Entered State: FollowLine")
 
-        self.car_service.drive(state=Decision.FOLLOW_LINE, blocked=False, distance=100)
+        self.vehicle_control_service.drive(state=Decision.FOLLOW_LINE, blocked=False, distance=100)
 
         decision = self.get_decision()
 

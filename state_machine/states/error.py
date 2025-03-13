@@ -1,5 +1,6 @@
 from utils.log_config import get_logger
 from .base_state import BaseState
+
 logger = get_logger(__name__)
 
 class Error(BaseState):
@@ -8,5 +9,4 @@ class Error(BaseState):
 
     def context(self):
         logger.error("Entered State: Error")
-        self.car_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
         "missing logic"

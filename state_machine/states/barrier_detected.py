@@ -10,12 +10,12 @@ logger = get_logger(__name__)
 class BarrierDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
-        self.car_service = VehicleControlService()
+        self.vehicle_control_service = VehicleControlService()
 
 
     def context(self):
         logger.info("Entered State: BarrierDetected")
-        self.car_service.stop(state=Decision.BARRIER_DETECTED, reason=StopTypes.OBSTACLE)
+        self.vehicle_control_service.stop(state=Decision.BARRIER_DETECTED, reason=StopTypes.OBSTACLE)
 
         decision = self.get_decision()
 
