@@ -1,3 +1,5 @@
+import random
+
 from communication.car_service import CarService
 from utils.log_config import get_logger
 from .base_state import BaseState
@@ -33,7 +35,11 @@ class FollowLine(BaseState):
 
     def get_decision(self):
         """
-        Placeholder for actual decision logic.
-        Replace this with sensor input, AI model, or UART response processing.
+        Placeholder for real decision-making logic.
+        If not overridden in tests, use random decision.
         """
-        return Decision.WAYPOINT_DETECTED
+        return random.choice([
+            Decision.WAYPOINT_DETECTED,
+            Decision.BARRIER_DETECTED,
+            Decision.CONE_DETECTED
+        ])
