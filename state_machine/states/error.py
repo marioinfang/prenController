@@ -8,5 +8,5 @@ class Error(BaseState):
 
     def context(self):
         logger.error("Entered State: Error")
-
+        self.car_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
         "missing logic"

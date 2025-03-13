@@ -12,11 +12,11 @@ logger = get_logger(__name__)
 class WaypointDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
-        self.car_service = VehicleControlService()
+        self.vehicle_control_service = VehicleControlService()
 
     def context(self):
         logger.info("Entered State: WaypointDetected")
-        self.car_service.stop(state=Decision.WAYPOINT_DETECTED, reason=StopTypes.WAYPOINT)
+        self.vehicle_control_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
 
         decision = self.get_decision()
 
