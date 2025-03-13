@@ -1,12 +1,16 @@
+from utils.log_config import get_logger
 from .base_state import BaseState
-from .decision_state import Decision
+from state_machine.types.decision_state import Decision
+
+logger = get_logger(__name__)
+
 
 class WaypointReached(BaseState):
     def __init__(self, machine):
         self.machine = machine
 
     def context(self):
-        print("State: WaypointReached")
+        logger.info("Entering State: WaypointReached")
 
         "missing logic"
 

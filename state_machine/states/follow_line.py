@@ -1,18 +1,24 @@
+from communication.car_service import CarService
+from utils.log_config import get_logger
 from .base_state import BaseState
-from .decision_state import Decision
+from state_machine.types.decision_state import Decision
+
+logger = get_logger(__name__)
+
 
 class FollowLine(BaseState):
     def __init__(self, machine):
         self.machine = machine
+        self.car_service = CarService()  # Inject CarService
 
     def context(self):
-        print("State: FollowLine")
+        logger.info("Entering State: FollowLine")
 
-        "missing logic"
+        self.car_service.drive(state=Decision.FOLLOW_LINE, blocked=False, distance=100)
 
-        decision = Decision.WAYPOINT_DETECTED
+        decision = self.get_decision()
 
-        if decision == Decision.BARRIER_DETECTED:
+        if decision == Decision.WAYPOINT_DETECTED:
             from .waypoint_detected import WaypointDetected
             self.machine.set_state(WaypointDetected(self.machine))
         elif decision == Decision.BARRIER_DETECTED:
@@ -24,3 +30,10 @@ class FollowLine(BaseState):
         else:
             from .error import Error
             self.machine.set_state(Error(self.machine))
+
+    def get_decision(self):
+        """
+        Placeholder for actual decision logic.
+        Replace this with sensor input, AI model, or UART response processing.
+        """
+        return Decision.WAYPOINT_DETECTED
