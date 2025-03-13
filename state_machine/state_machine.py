@@ -1,4 +1,5 @@
-from states.idle import Idle
+from state_machine.states.idle import Idle
+
 
 class StateMachine:
     def __init__(self):

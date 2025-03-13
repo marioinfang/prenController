@@ -1,7 +1,9 @@
-from communication.uart_handler import UARTHandler
-from state_machine.state_machine import CarStateMachine
+from state_machine.state_machine import StateMachine
 
 if __name__ == "__main__":
-    uart = UARTHandler("/dev/serial0", 115200, 2)
-    fsm = CarStateMachine(uart)
-    fsm.run()
+    current_state = StateMachine()
+
+    "To do real state change logic"
+
+    for _ in range (20):
+        current_state.change()
