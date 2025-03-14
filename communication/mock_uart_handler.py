@@ -29,7 +29,7 @@ class MockUARTHandler:
         try:
             received_data = self.mock_queue.get(timeout=1)
             logger.info(f"[MOCK] Received: {received_data}")
-            return "ERR asdad"
+            return "ACK"
         except queue.Empty:
             return ""
 
