@@ -1,7 +1,7 @@
-from communication.uart_handler import UARThandler
-from state_machine.state_machine import FahrzeugStateMachine
+from communication.uart_handler import UARTHandler
+from state_machine.state_machine import CarStateMachine
 
 if __name__ == "__main__":
-    uart = UARThandler()
-    fsm = FahrzeugStateMachine(uart)
+    uart = UARTHandler("some/port", 115200, 2)
+    fsm = CarStateMachine(uart)
     fsm.run()
