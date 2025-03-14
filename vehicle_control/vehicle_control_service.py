@@ -1,3 +1,4 @@
+from vehicle_control.execeptions.command_execution_exception import CommandExecutionError
 from vehicle_control.types.detection_type import StopTypes
 from vehicle_control.types.direction_type import DirectionType
 from state_machine.types.decision_state import Decision
@@ -25,7 +26,9 @@ class VehicleControlService:
     def _send_command(self, command: str):
         response = self.uart_service.send(command)
         if self._is_error_response(response):
-            logger.error(f"Failed to send command -> response: {response}")
+            error_msg = f"Error on command execution response-> {response}"
+            logger.error(error_msg)
+            raise CommandExecutionError(error_msg)
 
     @staticmethod
     def _is_error_response(response: str) -> bool:

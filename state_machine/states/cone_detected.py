@@ -1,8 +1,10 @@
 from vehicle_control.types.detection_type import StopTypes
+from vehicle_control.execeptions.command_execution_exception import CommandExecutionError
 from vehicle_control.vehicle_control_service import VehicleControlService
 from utils.log_config import get_logger
 from .base_state import BaseState
 from state_machine.types.decision_state import Decision
+from .error import Error
 
 logger = get_logger(__name__)
 
@@ -15,15 +17,16 @@ class ConeDetected(BaseState):
 
     def context(self):
         logger.info("Entered State: ConeDetected")
-        self.vehicle_control_service.stop(state=Decision.CONE_DETECTED, reason=StopTypes.CONE)
+        try:
+            self.vehicle_control_service.stop(state=Decision.CONE_DETECTED, reason=StopTypes.CONE)
 
-        decision = self.get_decision()
+            decision = self.get_decision()
 
-        if decision == Decision.FOLLOW_LINE:
-            from .follow_line import FollowLine
-            self.machine.set_state(FollowLine(self.machine))
-        else:
-            from .error import Error
+            if decision == Decision.FOLLOW_LINE:
+                from .follow_line import FollowLine
+                self.machine.set_state(FollowLine(self.machine))
+
+        except CommandExecutionError as e:
             self.machine.set_state(Error(self.machine))
 
     def get_decision(self):

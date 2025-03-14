@@ -1,9 +1,13 @@
 import random
-
+from vehicle_control.execeptions.command_execution_exception import CommandExecutionError
 from vehicle_control.vehicle_control_service import VehicleControlService
 from utils.log_config import get_logger
+from .barrier_detected import BarrierDetected
 from .base_state import BaseState
 from state_machine.types.decision_state import Decision
+from .cone_detected import ConeDetected
+from .error import Error
+from .waypoint_detected import WaypointDetected
 
 logger = get_logger(__name__)
 
@@ -16,21 +20,19 @@ class FollowLine(BaseState):
     def context(self):
         logger.info("Entered State: FollowLine")
 
-        self.vehicle_control_service.drive(state=Decision.FOLLOW_LINE, blocked=False, distance=100)
+        try:
+            self.vehicle_control_service.drive(state=Decision.FOLLOW_LINE, blocked=False, distance=100)
 
-        decision = self.get_decision()
+            decision = self.get_decision()
 
-        if decision == Decision.WAYPOINT_DETECTED:
-            from .waypoint_detected import WaypointDetected
-            self.machine.set_state(WaypointDetected(self.machine))
-        elif decision == Decision.BARRIER_DETECTED:
-            from .barrier_detected import BarrierDetected
-            self.machine.set_state(BarrierDetected(self.machine))
-        elif decision == Decision.CONE_DETECTED:
-            from .cone_detected import ConeDetected
-            self.machine.set_state(ConeDetected(self.machine))
-        else:
-            from .error import Error
+            if decision == Decision.WAYPOINT_DETECTED:
+                self.machine.set_state(WaypointDetected(self.machine))
+            elif decision == Decision.BARRIER_DETECTED:
+                self.machine.set_state(BarrierDetected(self.machine))
+            elif decision == Decision.CONE_DETECTED:
+                self.machine.set_state(ConeDetected(self.machine))
+
+        except CommandExecutionError:
             self.machine.set_state(Error(self.machine))
 
     def get_decision(self):

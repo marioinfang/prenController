@@ -1,9 +1,10 @@
 import random
-
+from vehicle_control.execeptions.command_execution_exception import CommandExecutionError
 from vehicle_control.vehicle_control_service import VehicleControlService
 from utils.log_config import get_logger
 from .base_state import BaseState
 from state_machine.types.decision_state import Decision
+from .error import Error
 
 logger = get_logger(__name__)
 
@@ -15,15 +16,15 @@ class WaypointDetected(BaseState):
 
     def context(self):
         logger.info("Entered State: WaypointDetected")
-        self.vehicle_control_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
+        try:
+            self.vehicle_control_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
 
-        decision = self.get_decision()
+            decision = self.get_decision()
 
-        if decision == Decision.WAYPOINT_REACHED:
-            from .waypoint_reached import WaypointReached
-            self.machine.set_state(WaypointReached(self.machine))
-        else:
-            from .error import Error
+            if decision == Decision.WAYPOINT_REACHED:
+                from .waypoint_reached import WaypointReached
+                self.machine.set_state(WaypointReached(self.machine))
+        except CommandExecutionError as e:
             self.machine.set_state(Error(self.machine))
 
     def get_decision(self):

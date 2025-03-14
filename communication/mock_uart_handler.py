@@ -1,4 +1,5 @@
 import queue
+import re
 
 from utils.log_config import get_logger
 
@@ -28,7 +29,7 @@ class MockUARTHandler:
         try:
             received_data = self.mock_queue.get(timeout=1)
             logger.info(f"[MOCK] Received: {received_data}")
-            return "ACK"
+            return "ERR asdad"
         except queue.Empty:
             return ""
 
