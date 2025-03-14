@@ -1,5 +1,6 @@
 from picamera2 import Picamera2
 from detection.path_analyzer import PathAnalyzer
+from detection.pi_camera import PiCamera
 from datetime import datetime
 import cv2
 import numpy as np
@@ -7,19 +8,18 @@ import os
 
 # YOLO-Modell initialisieren
 path_analyzer = PathAnalyzer('detection/model/best.onnx')
-
-picam2 = Picamera2()
+cam = PiCamera()
 
 # Konfiguration der Kamera (Auflösung, Framerate, etc.)
-config = picam2.create_still_configuration(main={"size": (640, 480)}) # Beispielauflösung
-picam2.configure(config)
+config = cam.create_still_configuration(main={"size": (640, 480)}) # Beispielauflösung
+cam.configure(config)
 
-picam2.start()
+cam.start()
 
 try:
     while True:
         # Frame erfassen
-        array = picam2.capture_array()
+        array = cam.capture_array()
 
         resized = cv2.resize(array, (640, 640), interpolation=cv2.INTER_LINEAR)
 
@@ -44,4 +44,4 @@ except KeyboardInterrupt:
     print("End loop")
 
 finally:
-    picam2.stop()
+    cam.stop()
