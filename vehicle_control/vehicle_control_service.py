@@ -30,6 +30,16 @@ class VehicleControlService:
             logger.error(error_msg)
             raise CommandExecutionError(error_msg)
 
+    def start_listen(self):
+        self.uart_service.start_listening()
+
+    def get_received_message(self):
+        return self.uart_service.get_received_message()
+
+    def stop_listen(self):
+        self.uart_service.stop_listening()
+
+
     @staticmethod
     def _is_error_response(response: str) -> bool:
         return response.startswith("ERR")
