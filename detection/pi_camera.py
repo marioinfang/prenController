@@ -4,7 +4,7 @@ import cv2
 class PiCamera:
     def __init__(self):
         self.camera = Picamera2()
-        config = self.camera.picam2.create_still_configuration(main={"size": (640, 480)})
+        config = self.camera.create_still_configuration(main={"size": (640, 480)})
         self.camera.configure(config)
         self.camera.start()
     
