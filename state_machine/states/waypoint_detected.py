@@ -1,5 +1,5 @@
 import random
-from vehicle_control.execeptions.command_execution_exception import CommandExecutionError
+from vehicle_control.exceptions.command_execution_exception import CommandExecutionError
 from vehicle_control.vehicle_control_service import VehicleControlService
 from utils.log_config import get_logger
 from .base_state import BaseState

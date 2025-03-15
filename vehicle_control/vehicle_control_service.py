@@ -1,9 +1,9 @@
-from vehicle_control.execeptions.command_execution_exception import CommandExecutionError
-from vehicle_control.types.detection_type import StopTypes
-from vehicle_control.types.direction_type import DirectionType
+from communication.uart_service import UARTService
 from state_machine.types.decision_state import Decision
 from utils.log_config import get_logger
-from communication.uart_service import UARTService
+from vehicle_control.exceptions.command_execution_exception import CommandExecutionError
+from vehicle_control.types.detection_type import StopTypes
+from vehicle_control.types.direction_type import DirectionType
 
 logger = get_logger(__name__)
 

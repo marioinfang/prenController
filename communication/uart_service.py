@@ -1,21 +1,13 @@
 import time
 import threading
 import queue
+
+from communication.mock_uart_handler import MockUARTHandler
+from communication.uart_handler import UARTHandler
 from utils.log_config import get_logger
-from .mock_uart_handler import MockUARTHandler
-from .uart_handler import UARTHandler
+from utils.raspberry_checker import is_raspberry_pi
 
 logger = get_logger(__name__)
-
-# TODO: Use an environment variable instead of this workaround
-def is_raspberry_pi():
-    try:
-        with open("/proc/cpuinfo", "r") as f:
-            cpuinfo = f.read()
-        return "Raspberry Pi" in cpuinfo
-    except FileNotFoundError:
-        return False
-
 
 class UARTService:
     def __init__(self):
