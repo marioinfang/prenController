@@ -11,19 +11,19 @@ class VehicleControlService:
     def __init__(self):
         self.uart_service = UARTService()
 
-    def drive(self, state: Decision, blocked: bool, distance: int):
+    def drive(self, state: Decision, blocked: bool, distance: int) -> None:
         self._send_command(f"drive({state},{blocked},{distance})")
 
-    def stop(self, state: Decision, reason: StopTypes):
+    def stop(self, state: Decision, reason: StopTypes) -> None:
         self._send_command(f"stop({state},{reason})")
 
-    def drive_to_waypoint(self, state: Decision):
+    def drive_to_waypoint(self, state: Decision) -> None:
         self._send_command(f"drive_to_waypoint({state})")
 
-    def rotate(self, state: Decision, direction: DirectionType, angle: int):
+    def rotate(self, state: Decision, direction: DirectionType, angle: int) -> None:
         self._send_command(f"rotate({state},{direction},{angle})")
 
-    def _send_command(self, command: str):
+    def _send_command(self, command: str) -> None:
         response = self.uart_service.send(command)
         if self._is_error_response(response):
             error_msg = f"Error on command execution response-> {response}"
@@ -33,7 +33,7 @@ class VehicleControlService:
     def start_listen(self):
         self.uart_service.start_listening()
 
-    def get_received_message(self):
+    def get_received_message(self) -> str:
         return self.uart_service.get_received_message()
 
     def stop_listen(self):

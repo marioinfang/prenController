@@ -1,6 +1,6 @@
 import logging
 
-def get_logger(name):
+def get_logger(name) -> logging.Logger:
     """Returns a configured logger for the given name."""
     logger = logging.getLogger(name)
     if not logger.hasHandlers():
