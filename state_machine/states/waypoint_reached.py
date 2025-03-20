@@ -15,9 +15,9 @@ class WaypointReached(BaseState):
         if decision == Decision.FINISH_LINE_REACHED:
             from .finish_line_reached import FinishLineReached
             self.machine.set_state(FinishLineReached(self.machine))
-        elif decision == Decision.FOLLOW_LINE:
-            from .follow_line import FollowLine
-            self.machine.set_state(FollowLine(self.machine))
+        elif decision == Decision.SEARCH_PATH:
+            from .search_path import SearchPath
+            self.machine.set_state(SearchPath(self.machine))
         else:
             from .error import Error
             self.machine.set_state(Error(self.machine))
