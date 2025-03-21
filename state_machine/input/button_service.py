@@ -11,9 +11,9 @@ except ImportError:
 logger = get_logger(__name__)
 
 BUTTON_PINS = {
-    "A": 17,
-    "B": 27,
-    "C": 22
+    "A": 16,
+    "B": 20,
+    "C": 21
 }
 
 class ButtonService:
