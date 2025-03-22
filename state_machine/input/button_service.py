@@ -42,11 +42,14 @@ class ButtonService:
     def stop(self) -> None:
         self.running = False
 
+    def make_callback(self,name):
+        return lambda: self._handle_press(name)
+
     def _initialize_real_buttons(self):
         logger.info("Initializing real GPIO buttons")
         self.buttons = {name: Button(pin) for name, pin in BUTTON_PINS.items()}
         for name, button in self.buttons.items():
-            button.when_pressed = lambda name: self._handle_press(name)
+            button.when_pressed = self.make_callback(name)
 
     def _initialize_mock_buttons(self) -> None:
         logger.info("Initializing mock button input")
@@ -54,6 +57,7 @@ class ButtonService:
         self.listen_thread.start()
 
     def _handle_press(self, name: str):
+        logger.info("Handling button press"+name)
         if name in ["A", "B", "C"]:
             self.selected_destination = name
             logger.info(f"Destination selected: {name}. Now press 'Start' to continue.")
