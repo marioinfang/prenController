@@ -7,7 +7,6 @@ from vehicle_control.vehicle_control_service import VehicleControlService
 from .base_state import BaseState
 from .error import Error
 from ..input.button_service import ButtonService
-from ..input.character_recognition_service import process_image
 
 logger = get_logger(__name__)
 
