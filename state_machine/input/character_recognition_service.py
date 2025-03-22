@@ -29,5 +29,5 @@ def process_image(image_path):
         return None
 
 if __name__ == "__main__":
-    extracted_text = process_image("../../images/test_image_a_flipped.jpeg")
+    extracted_text = process_image("images/test_image_a_flipped.jpeg")
     print("Extracted Text:", extracted_text)
