@@ -46,7 +46,7 @@ class UARTHandler:
             raise ConnectionError("UART connection is not open!")
         try:
             received_data = self.serial_conn.readline().decode('utf-8').strip()
-            logger.info(f"Sending: {received_data}")
+            logger.info(f"Received: {received_data}")
             return received_data
         except serial.SerialException as e:
             raise ConnectionError(f"Failed to receive data: {e}")
