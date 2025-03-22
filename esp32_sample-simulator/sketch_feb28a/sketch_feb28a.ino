@@ -19,23 +19,7 @@ void loop() {
 
         Serial.print("Received: ");
         Serial.println(command);
-
-      
-        if (command.startsWith("drive")) {
-            delay(random(500, 1500));
-            uart.println("ACK");
-        }
-        else if (command == "stop") {
-            delay(random(500, 1500));
-            uart.println("ACK");
-        }
-        else if (command == "drive_to_waypoint") {
-            delay(random(500, 1500));
-            uart.println("ACK");
-        } 
-        else if (command == "rotate") {
-            delay(random(500, 1500));
-            uart.println("ACK");
-        }
+        delay(random(500, 1000));
+        uart.println("ACK");
     }
 }
