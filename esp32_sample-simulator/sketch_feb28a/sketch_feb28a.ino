@@ -19,48 +19,7 @@ void loop() {
 
         Serial.print("Received: ");
         Serial.println(command);
-
-        if (command.length() > 0) {
-             Serial.print("sending: ");
-            uart.println("ACK");
-        }
-        else if (command.startsWith("drive")) {
-                uart.println("ACK");
-        }
-        else if (command == "WEG_BEFAHREN") {
-            delay(random(500, 4000));
-            int randomValue = random(3);
-            if (randomValue == 0) {
-                uart.println("AUSRICHTUNG_NOTWENDIG");
-            } else if(randomValue == 1){
-                uart.println("ZIEL_ERKANNT");
-            } else {
-                uart.println("ack");
-            }
-        }
-        else if (command == "ANALYSIERE_WEGPUNKT") {
-            delay(random(500, 4000));
-            uart.println("ZIEL_ERKANNT");
-        } 
-        else if (command == "ZIEL_IDENTIFIZIEREN") {
-            delay(random(500, 4000));
-            uart.println("HINDERNIS_GEFUNDEN");
-        } 
-        else if (command == "HINDERNIS_ANHEBEN") {
-            uart.println("HEBEN");
-            delay(random(500, 4000));
-            uart.println("HEBEN_FERTIG");
-        }
-        else if (command == "IDENTIFIZIERE_ZIEL"){
-            int randomValue = random(2);
-            if (randomValue) {
-                uart.println("HINDERNIS_GEFUNDEN");
-            } else {
-                uart.println("ack");
-            }
-        }
-        else {
-            uart.println("ERROR");
-        }
+        delay(random(500, 1000));
+        uart.println("ACK");
     }
 }

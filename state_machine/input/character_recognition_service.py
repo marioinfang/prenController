@@ -1,28 +1,3 @@
-from time import sleep
-
-from utils.raspberry_checker import is_raspberry_pi
-
-try:
-    from picamera2 import Picamera2
-    RASPBERRY_PI = True
-except ImportError:
-    RASPBERRY_PI = False
-
-def capture_image():
-    if RASPBERRY_PI and is_raspberry_pi():
-        print("Running on Raspberry Pi - Using Pi Camera")
-        picam2 = Picamera2()
-        picam2.start()
-        sleep(2)  # Give the camera time to adjust
-        image_path = "/home/pi/captured_image.jpg"
-        picam2.capture_file(image_path)
-        picam2.stop()
-    else:
-        print("Running on Local Machine - Using Hardcoded Image")
-        image_path = "../../images/test_image_c_flipped.jpeg"  # Use a local test image
-
-    return image_path
-
 import cv2
 import easyocr
 
@@ -54,6 +29,5 @@ def process_image(image_path):
         return None
 
 if __name__ == "__main__":
-    img_path = capture_image()
-    extracted_text = process_image(img_path)
+    extracted_text = process_image("images/test_image_a_flipped.jpeg")
     print("Extracted Text:", extracted_text)

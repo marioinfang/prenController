@@ -1,15 +1,13 @@
-import random
-
+from state_machine.types.decision_state import Decision
+from utils.log_config import get_logger
 from vehicle_control.exceptions.command_execution_exception import CommandExecutionError
 from vehicle_control.types.detection_type import StopTypes
 from vehicle_control.types.direction_type import DirectionType
 from vehicle_control.vehicle_control_service import VehicleControlService
-from utils.log_config import get_logger
 from .base_state import BaseState
-from state_machine.types.decision_state import Decision
 from .error import Error
 from ..input.button_service import ButtonService
-from ..input.character_recognition_service import process_image
+
 logger = get_logger(__name__)
 
 
@@ -51,7 +49,8 @@ class WaypointReached(BaseState):
         logger.info(f"Our destination is {destination}")
 
         logger.info("Processing Image")
-        result = process_image("../../images/test_image_c_flipped.jpeg")
+        #result = process_image("../input/images/test_image_c_flipped.jpeg")
+        result = True
         logger.info(f"Image result: {result}")
         if destination == result:
             return True
