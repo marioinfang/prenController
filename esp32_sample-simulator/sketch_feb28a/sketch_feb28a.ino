@@ -20,17 +20,12 @@ void loop() {
         Serial.print("Received: ");
         Serial.println(command);
 
-        if (command == "INIT_COMPLETE") {
-            delay(random(500, 4000));
-            uart.println("ack");
+        if (command.length() > 0) {
+             Serial.print("sending: ");
+            uart.println("ACK");
         }
-        else if (command == "FAHRE_WEITER") {
-            int randomValue = random(2);
-            if (randomValue) {
-                uart.println("WEGPUNKT_ERREICHT");
-            } else {
-                uart.println("ack");
-            }
+        else if (command.startsWith("drive")) {
+                uart.println("ACK");
         }
         else if (command == "WEG_BEFAHREN") {
             delay(random(500, 4000));

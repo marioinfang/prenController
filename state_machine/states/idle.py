@@ -11,7 +11,8 @@ class Idle(BaseState):
     def __init__(self, machine):
         self.machine = machine
         self.running = True
-        self.button_service = ButtonService(self.button_pressed)
+        self.button_service = ButtonService.get_instance()
+        self.button_service.set_start_callback(self.button_pressed)
 
     def context(self):
         logger.info("State: Idle - Waiting for button press")

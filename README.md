@@ -8,7 +8,7 @@ Before starting the project, make sure you have the following installed:
 
 - **Python** (Recommended: 3.9+)
 
-## 1. Create Virtual Environment
+## 1. Create Virtual Environment (ignore on raspberry pi)
 ```sh
 python -m venv venv
 source venv/bin/activate #macos
@@ -23,4 +23,12 @@ pip install -r requirements.txt
 ```sh
  python -m unittest tests.<your_test_file>
 (e.g python -m unittest tests.test_uart_handler)
+```
+
+## 3. RPi Setup
+```sh
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt install python3-gpiozero
+pip install -r requirements
 ```
