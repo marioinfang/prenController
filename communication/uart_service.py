@@ -29,9 +29,7 @@ class UARTService:
             start_time = time.time()
             while time.time() - start_time < ack_timeout:
                 response = self.uart.receive()
-
                 if response:
-                    logger.info(f"Received: {response}")
                     return response
 
             logger.warning(f"No ACK received for {command}, retrying...")
