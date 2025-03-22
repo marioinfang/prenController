@@ -50,7 +50,8 @@ class WaypointReached(BaseState):
         logger.info(f"Our destination is {destination}")
 
         logger.info("Processing Image")
-        result = process_image("../input/images/test_image_c_flipped.jpeg")
+        #result = process_image("../input/images/test_image_c_flipped.jpeg")
+        result = True
         logger.info(f"Image result: {result}")
         if destination == result:
             return True
