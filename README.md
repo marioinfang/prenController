@@ -31,3 +31,5 @@ sudo apt-get update
 sudo apt-get upgrade
 sudo apt install python3-gpiozero
 ```
+Then disable Serial Login stuff via raspi-config and enable uart
+-> nano /boot/firmware/config.txt -> enable_uart=1
