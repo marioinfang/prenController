@@ -8,7 +8,7 @@ Before starting the project, make sure you have the following installed:
 
 - **Python** (Recommended: 3.9+)
 
-## 1. Create Virtual Environment (ignore on raspberry pi)
+## 1. Create Virtual Environment 
 ```sh
 python -m venv venv
 source venv/bin/activate #macos
@@ -30,5 +30,4 @@ pip install -r requirements.txt
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt install python3-gpiozero
-pip install -r requirements
 ```
