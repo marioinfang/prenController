@@ -19,7 +19,7 @@ def capture_image():
         picam2.stop()
     else:
         print("Running on Local Machine - Using Hardcoded Image")
-        image_path = "../../images/test_image_c_flipped.jpeg"  # Use a local test image
+        image_path = "../../images/test_image_a_flipped.jpeg"  # Use a local test image
 
     return image_path
 
