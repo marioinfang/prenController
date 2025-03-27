@@ -25,14 +25,6 @@ class WaypointReached(BaseState):
 
             decision = self.get_decision()
 
-<<<<<<< HEAD
-        if decision == Decision.FINISH_LINE_REACHED:
-            from .finish_line_reached import FinishLineReached
-            self.machine.set_state(FinishLineReached(self.machine))
-        elif decision == Decision.SEARCH_PATH:
-            from .search_path import SearchPath
-            self.machine.set_state(SearchPath(self.machine))
-=======
             if decision == Decision.FINISH_LINE_REACHED:
                 from .finish_line_reached import FinishLineReached
                 self.vehicle_control_service.stop(Decision.FINISH_LINE_REACHED, StopTypes.WAYPOINT)
@@ -48,7 +40,6 @@ class WaypointReached(BaseState):
     def get_decision(self):
         if self._is_destination_waypoint():
             return Decision.FINISH_LINE_REACHED
->>>>>>> main
         else:
             return Decision.FOLLOW_LINE
 
