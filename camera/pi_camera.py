@@ -1,5 +1,9 @@
-from picamera2 import Picamera2
 import cv2
+
+from picamera2 import Picamera2
+from utils.log_config import get_logger
+
+logger = get_logger(__name__)
 
 class PiCamera:
     def __init__(self):
@@ -9,10 +13,9 @@ class PiCamera:
         self.camera.start()
     
     def take_picture(self):
-        # take picture
-        raw_img = self.camera.capture_array()
-        print("took image")
-
+        raw_img = self.camera.capture_array() # take picture
+        logger.info("Took image")
+        
         # rezie picture to trained model size
         resized_img = cv2.resize(raw_img, (640, 640), interpolation=cv2.INTER_LINEAR)
 

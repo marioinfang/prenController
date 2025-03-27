@@ -2,7 +2,7 @@ from .base_state import BaseState
 from .decision_state import Decision
 
 from detection.path_analyzer import PathAnalyzer
-from detection.pi_camera import PiCamera
+from camera.pi_camera import PiCamera
 
 class AnalyzePath(BaseState):
     def __init__(self, machine):
