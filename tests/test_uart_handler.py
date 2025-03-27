@@ -9,7 +9,7 @@ class TestUARTHandler(TestCase):
     def test_connect(self, mock_serial):
         uart = UARTHandler("/dev/serial0")
         uart.connect()
-        mock_serial.assert_called_with(port="/dev/serial0", baudrate=115200, timeout=1)
+        mock_serial.assert_called_with(port="/dev/serial0", baudrate=115200, timeout=2)
 
     @patch("serial.Serial")
     def test_connect_failure(self, mock_serial):
