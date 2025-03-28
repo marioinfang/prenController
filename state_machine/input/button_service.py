@@ -8,7 +8,7 @@ logger = get_logger(__name__)
 BUTTON_PINS = {
     "A": 6,
     "B": 13,
-    "C": 25,
+    "C": 19,
     "Start": 26
 }
 
