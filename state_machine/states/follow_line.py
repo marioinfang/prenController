@@ -9,6 +9,9 @@ from .waypoint_detected import WaypointDetected
 from state_machine.types.decision_state import Decision
 from vehicle_control.types.detection_type import StopTypes
 from .error import Error
+from utils.log_config import get_logger
+
+logger = get_logger(__name__)
 
 class FollowLine(BaseState):
     UPDATE_INTERVAL = 0.1  
@@ -34,7 +37,7 @@ class FollowLine(BaseState):
         self.current_distance = self.DEFAULT_DRIVE_DISTANCE  
 
     def context(self):
-        print("Entered State: FollowLine")
+        logger.info("Entered State: FollowLine")
 
         try:
             while self.machine.current_state == self:
@@ -43,7 +46,7 @@ class FollowLine(BaseState):
                 
                 detections = self.detection_service.capture_and_detect()
                 if detections:
-                    print(f"Detections: {detections}")
+                    logger.info(f"Detections: {detections}")
                 
                 distance_data = self.detection_service.get_distance_to_nearest_object()
                 
@@ -53,7 +56,7 @@ class FollowLine(BaseState):
                         self._handle_detected_object(distance, object_type)
 
         except CommandExecutionError as e:
-            print(f"Error: {e}")
+            logger.info(f"Error: {e}")
             self.machine.set_state(Error(self.machine))
 
     def _drive_vehicle(self):
@@ -66,16 +69,16 @@ class FollowLine(BaseState):
             self.current_distance = self.DEFAULT_DRIVE_DISTANCE
             return
 
-        print(f"Object '{object_type}' detected at {distance}, adjusting distance.")
+        logger.info(f"Object '{object_type}' detected at {distance}, adjusting distance.")
         self.current_distance = max(20, int((distance / object_safe_distance) * self.DEFAULT_DRIVE_DISTANCE))
 
         if distance < object_safe_distance // 2:  
-            print(f"Stopping due to '{object_type}' detected at {distance}.")
+            logger.info(f"Stopping due to '{object_type}' detected at {distance}.")
             self.vehicle_control_service.stop(state=Decision.FOLLOW_LINE, reason=StopTypes.OBSTACLE_DETECTED)
 
             next_state = self.OBJECT_STATES.get(object_type)
             if next_state:
-                print(f"Switching to state: {next_state.__name__}")
+                logger.info(f"Switching to state: {next_state.__name__}")
                 self.machine.set_state(next_state(self.machine))
             else:
-                print("Unknown object detected. Continuing to follow the line.")
+                logger.info("Unknown object detected. Continuing to follow the line.")
