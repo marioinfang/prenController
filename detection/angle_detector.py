@@ -133,9 +133,3 @@ class AngleDetector():
         logger.info(f"Found line on waypoint with angle: {angle_deg}")
 
         return angle_deg
-
-
-
-# Beispielaufruf
-detector = AngleDetector()
-detector.get_angles()
