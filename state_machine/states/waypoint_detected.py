@@ -4,6 +4,7 @@ from state_machine.types.decision_state import Decision
 from utils.log_config import get_logger
 from vehicle_control.exceptions.command_execution_exception import CommandExecutionError
 from vehicle_control.vehicle_control_service import VehicleControlService
+from detection.angle_detector import AngleDetector
 from .base_state import BaseState
 from .error import Error
 
@@ -14,6 +15,7 @@ class WaypointDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
+        self.angle_detecor = AngleDetector(False)
 
     def context(self):
         logger.info("Entered State: WaypointDetected")
@@ -33,6 +35,9 @@ class WaypointDetected(BaseState):
         Placeholder for real decision-making logic.
         If not overridden in tests, use random decision.
         """
+        angles = self.angle_detecor.get_angles()
+        self.machine.set_data(angles)
+
         return random.choice([
             Decision.WAYPOINT_REACHED
         ])

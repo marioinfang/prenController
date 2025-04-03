@@ -15,12 +15,14 @@ class PiCamera:
     def take_picture(self):
         raw_img = self.camera.capture_array() # take picture
         logger.info("Took image")
+
+        img = cv2.rotate(raw_img, cv2.ROTATE_180)
         
         # rezie picture to trained model size
-        resized_img = cv2.resize(raw_img, (640, 640), interpolation=cv2.INTER_LINEAR)
+        img = cv2.resize(img, (640, 640), interpolation=cv2.INTER_LINEAR)
 
         # convertion from BGR to RGB
-        img = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         return img
 

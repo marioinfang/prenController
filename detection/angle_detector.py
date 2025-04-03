@@ -3,37 +3,41 @@ import numpy as np
 
 from sklearn.cluster import KMeans
 from utils.log_config import get_logger
-from camera.pi_camera import PiCamera
 
 logger = get_logger(__name__)
 
 class AngleDetector():
 
     def __init__(self, test_mode: False):
-        self.camera = PiCamera()
         self.test_mode = test_mode
 
     def get_angles(self):
         angles = []
         
         #img = self.camera.take_picture()
-        img = cv2.imread("C:/Users/minfang/HSLU/PREN/images/point.jpg")
+        img = cv2.imread("C:/Users/minfang/Downloads/bild.jpg")
 
         transformed_img = self.transform_img(img)
+
+        cv2.imshow("Gefundene Randpunkte & Winkel", transformed_img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         circle_center = self.get_circle_center(transformed_img)
 
         edge_points = self.get_edge_points(transformed_img)
-        
+
         for edge_point in edge_points:
             angles.append(self.calculate_angle(circle_center, edge_point))
 
             if self.test_mode:
                 cv2.circle(transformed_img, (edge_point[0], edge_point[1]), 5, (0, 0, 255), -1)  # draw edge point on image
                 cv2.line(transformed_img, circle_center, (edge_point[0], edge_point[1]), (255, 0, 0), 2)  # draw blue line
+                cv2.putText(transformed_img, str(round(self.calculate_angle(circle_center, edge_point))),(edge_point[0], edge_point[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
-        if self.test_mode:
-            cv2.imwrite()
+        cv2.imshow("Gefundene Randpunkte & Winkel", transformed_img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         return angles  
 
@@ -77,6 +81,10 @@ class AngleDetector():
         # turns ever pixel black except defined range
         _, binary = cv2.threshold(gray_img, 200, 255, cv2.THRESH_BINARY)
 
+        cv2.imshow("Gefundene Randpunkte & Winkel", binary)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
         # search for white pixels on top and bottom image line
         for x in range(width):
             if binary[0, x] == 255:  # top
@@ -91,7 +99,23 @@ class AngleDetector():
             if binary[y, width - 1] == 255:  # right
                 white_edge_pixles.append((width - 1, y))
 
-        
+        if len(white_edge_pixles) > 1:
+            # Elbow-Methode zur Bestimmung der optimalen Anzahl von Clustern
+            sse = []
+            for k in range(1, min(6, len(white_edge_pixles))):  # K zwischen 1 und 5 (oder len(edge_points))
+                kmeans = KMeans(n_clusters=k, n_init=10).fit(white_edge_pixles)
+                sse.append(kmeans.inertia_)  # Summe der quadrierten Fehler
+
+            deltas = np.diff(sse)
+            k_optimal = np.argmax(deltas) + 1  # Index + 1
+
+            kmeans = KMeans(n_clusters=k_optimal, n_init=10).fit(white_edge_pixles)
+            cluster_centers = kmeans.cluster_centers_.astype(int)
+        else:
+            cluster_centers = white_edge_pixles
+
+        return cluster_centers
+
         if len(white_edge_pixles) > 1:
             kmeans = KMeans(n_clusters=min(5, len(white_edge_pixles)), n_init=10).fit(white_edge_pixles)
             edge_points = kmeans.cluster_centers_.astype(int)
@@ -102,9 +126,9 @@ class AngleDetector():
 
     def transform_img(self, img):
         # coordinates to transform
-        tl = (900,1400)
+        tl = (900,1300)
         bl = (400, 1900)
-        tr = (1700,1400)
+        tr = (1700,1300)
         br = (2200,1900)
 
         if self.test_mode:
@@ -112,6 +136,19 @@ class AngleDetector():
             cv2.circle(img, bl, 5, (0,0,255), -1)
             cv2.circle(img, tr, 5, (0,0,255), -1)
             cv2.circle(img, br, 5, (0,0,255), -1)
+
+            # Bildgröße reduzieren (Skalierungsfaktor anpassen)
+            scale_percent = 10  # Beispiel: 50% der Originalgröße
+            width = int(img.shape[1] * scale_percent / 100)
+            height = int(img.shape[0] * scale_percent / 100)
+            dim = (width, height)
+
+            # Bild skalieren
+            resized_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
+            cv2.imshow("Gefundene Randpunkte & Winkel", resized_img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
         
         # transform image
         pts1 = np.float32([tl, bl, tr, br])
@@ -125,7 +162,7 @@ class AngleDetector():
     def calculate_angle(self, circle_center, edge_point):
         delta_y = edge_point[1] - circle_center[1]
         delta_x = edge_point[0] - circle_center[0]
-        angle_rad = np.arctan2(delta_x, delta_y)
+        angle_rad = np.arctan2(-delta_x, delta_y)
         angle_deg = np.degrees(angle_rad)
 
         # ensure that the angle is between 0 and 360
