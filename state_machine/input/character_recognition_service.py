@@ -116,7 +116,7 @@ def _brute_force_rotate(image, debug=False):
             cv2.imwrite(f"debug_rotated_{angle}.png", rotated)
     return results
 
-def process_image(image_path, debug=False):
+def scan_node(image_path, debug=False):
     """
     Read the image, whiten the background outside the detected circle using an adjusted radius,
     preprocess the image for OCR, perform brute-force rotation OCR,
