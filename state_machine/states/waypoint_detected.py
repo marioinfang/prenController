@@ -32,6 +32,9 @@ class WaypointDetected(BaseState):
             if decision == Decision.WAYPOINT_REACHED:
                 from .waypoint_reached import WaypointReached
                 self.machine.set_state(WaypointReached(self.machine, angles))
+            if decision == Decision.FINISH_LINE_REACHED:
+                from .finish_line_reached import FinishLineReached
+                self.machine.set_state(FinishLineReached(self.machine))
         except CommandExecutionError:
             self.machine.set_state(Error(self.machine))
 
@@ -40,8 +43,6 @@ class WaypointDetected(BaseState):
         Placeholder for real decision-making logic.
         If not overridden in tests, use random decision.
         """
-        if self._is_destination_waypoint():
-            return Decision.FINISH_LINE_REACHED
         
         if is_raspberry_pi():
             from camera.pi_camera import PiCamera
@@ -49,18 +50,21 @@ class WaypointDetected(BaseState):
         else:
             import cv2
             img = cv2.imread("state_machine/input/images/testKreis30.png")
-        
+
+        if self._is_destination_waypoint(img):
+            return Decision.FINISH_LINE_REACHED
+
         angles = self.angle_detecor.get_angles(img)
 
         return Decision.WAYPOINT_REACHED, angles
 
-    def _is_destination_waypoint(self):
+    def _is_destination_waypoint(self, img):
         logger.info("Checking whether the waypoint is our destination state")
         destination = self.button_service.get_selected_destination()
         logger.info(f"Our destination is {destination}")
 
         logger.info("Processing Image")
-        result = scan_node("../../tests/images/letter_A/A_3.jpeg");
+        result = scan_node(img);
         logger.info(f"Image result: {result}")
         if destination == result:
             return True
