@@ -1,5 +1,4 @@
 import threading
-from gpiozero import Button
 from utils.log_config import get_logger
 from utils.raspberry_checker import is_raspberry_pi
 
@@ -47,6 +46,7 @@ class ButtonService:
 
     def _initialize_real_buttons(self):
         logger.info("Initializing real GPIO buttons")
+        from gpiozero import Button
         self.buttons = {name: Button(pin) for name, pin in BUTTON_PINS.items()}
         for name, button in self.buttons.items():
             button.when_pressed = self.make_callback(name)

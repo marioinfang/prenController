@@ -27,13 +27,13 @@ scenario_1 = [
     Decision.START,
     Decision.FOLLOW_LINE,
     Decision.WAYPOINT_DETECTED,
-    Decision.WAYPOINT_REACHED,
+    (Decision.WAYPOINT_REACHED, [0, 90, 180, 270]),
     Decision.FOLLOW_LINE,
     Decision.WAYPOINT_DETECTED,
-    Decision.WAYPOINT_REACHED,
+    (Decision.WAYPOINT_REACHED, [0, 90, 180, 270]),
     Decision.FOLLOW_LINE,
     Decision.WAYPOINT_DETECTED,
-    Decision.WAYPOINT_REACHED,
+    (Decision.WAYPOINT_REACHED, [0, 90, 180, 270]),
     Decision.FOLLOW_LINE,
     Decision.FINISH_LINE_REACHED
 ]

@@ -16,11 +16,12 @@ logger = get_logger(__name__)
 
 
 class WaypointReached(BaseState):
-    def __init__(self, machine):
+    def __init__(self, machine, angles):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
         self.button_service = ButtonService.get_instance()
-        self.line_analyzer = PathAnalyzer()
+        self.line_analyzer = PathAnalyzer("model/best.onnx")
+        self.angles = angles
 
     def context(self):
         logger.info("Entered State: WaypointReached")
@@ -64,7 +65,7 @@ class WaypointReached(BaseState):
             return False
         
     def _find_line(self):
-        sorted_angles = sorted(self.machine.data)
+        sorted_angles = sorted(self.angles)
 
         for angle in sorted_angles[:-1]:
             self.vehicle_control_service.rotate(Decision.WAYPOINT_REACHED, DirectionType.RIGHT, angle)
@@ -81,6 +82,7 @@ class WaypointReached(BaseState):
         if is_raspberry_pi():
             from camera.pi_camera import PiCamera
             img = PiCamera.take_picture()
-            self.line_analyzer.analyze_path(img)
+            is_cone_on_line,_,_ = self.line_analyzer.analyze_path(img)
+            return not is_cone_on_line
 
         return random.choice([True, False])

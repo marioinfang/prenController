@@ -7,6 +7,7 @@ from vehicle_control.vehicle_control_service import VehicleControlService
 from detection.angle_detector import AngleDetector
 from .base_state import BaseState
 from .error import Error
+from utils.raspberry_checker import is_raspberry_pi
 
 logger = get_logger(__name__)
 
@@ -20,13 +21,13 @@ class WaypointDetected(BaseState):
     def context(self):
         logger.info("Entered State: WaypointDetected")
         try:
-            self.vehicle_control_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
+            decision, angles = self.get_decision()
 
-            decision = self.get_decision()
+            self.vehicle_control_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
 
             if decision == Decision.WAYPOINT_REACHED:
                 from .waypoint_reached import WaypointReached
-                self.machine.set_state(WaypointReached(self.machine))
+                self.machine.set_state(WaypointReached(self.machine, angles))
         except CommandExecutionError:
             self.machine.set_state(Error(self.machine))
 
@@ -35,9 +36,14 @@ class WaypointDetected(BaseState):
         Placeholder for real decision-making logic.
         If not overridden in tests, use random decision.
         """
-        angles = self.angle_detecor.get_angles()
+        if is_raspberry_pi:
+            from camera.pi_camera import PiCamera
+            img = PiCamera().take_picture()
+        else:
+            import cv2
+            img = cv2.imread("../input/images/test_image_c_flipped.jpeg")
+        
+        angles = self.angle_detecor.get_angles(img)
         self.machine.set_data(angles)
 
-        return random.choice([
-            Decision.WAYPOINT_REACHED
-        ])
+        return Decision.WAYPOINT_REACHED, angles

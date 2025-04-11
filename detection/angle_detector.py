@@ -1,31 +1,26 @@
 import cv2
 import numpy as np
+from collections import defaultdict
 
 from sklearn.cluster import KMeans
 from utils.log_config import get_logger
 
 logger = get_logger(__name__)
+SHOW_IMAGES = False
 
 class AngleDetector():
 
     def __init__(self, test_mode: False):
         self.test_mode = test_mode
 
-    def get_angles(self):
+    def get_angles(self, img):
         angles = []
-        
-        #img = self.camera.take_picture()
-        img = cv2.imread("C:/Users/minfang/Downloads/bild.jpg")
 
         transformed_img = self.transform_img(img)
 
-        cv2.imshow("Gefundene Randpunkte & Winkel", transformed_img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
         circle_center = self.get_circle_center(transformed_img)
 
-        edge_points = self.get_edge_points(transformed_img)
+        edge_points = self.get_edge_points(transformed_img, circle_center)
 
         for edge_point in edge_points:
             angles.append(self.calculate_angle(circle_center, edge_point))
@@ -34,30 +29,75 @@ class AngleDetector():
                 cv2.circle(transformed_img, (edge_point[0], edge_point[1]), 5, (0, 0, 255), -1)  # draw edge point on image
                 cv2.line(transformed_img, circle_center, (edge_point[0], edge_point[1]), (255, 0, 0), 2)  # draw blue line
                 cv2.putText(transformed_img, str(round(self.calculate_angle(circle_center, edge_point))),(edge_point[0], edge_point[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        
+        # map smalest angle to 0
+        distance_to_0 = np.abs(np.array(angles) - 0)
+        distance_to_360 = np.abs(np.array(angles) - 360)
+        angles[np.argmin(np.minimum(distance_to_0, distance_to_360))] = 0
 
         cv2.imshow("Gefundene Randpunkte & Winkel", transformed_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-        return angles  
+        return angles
+    
+    def transform_img(self, img):
+        """
+        Transforms an image so that the waypoint is visible from above.
+        """
+
+        # coordinates to transform
+        tl = (600,1050)
+        bl = (0, 1944)
+        tr = (2050,1050)
+        br = (2592,1944)
+
+        if SHOW_IMAGES:
+            tem_img = img
+            cv2.circle(tem_img, tl, 5, (0,0,255), -1)
+            cv2.circle(tem_img, bl, 5, (0,0,255), -1)
+            cv2.circle(tem_img, tr, 5, (0,0,255), -1)
+            cv2.circle(tem_img, br, 5, (0,0,255), -1)
+
+            scale_percent = 15
+            width = int(tem_img.shape[1] * scale_percent / 100)
+            height = int(tem_img.shape[0] * scale_percent / 100)
+            resized_img = cv2.resize(tem_img, (width, height), interpolation=cv2.INTER_AREA)
+
+            cv2.imshow("Befor transformation", resized_img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        
+        # transform image
+        pts1 = np.float32([tl, bl, tr, br])
+        pts2 = np.float32([(0,0), (0,600), (600,0), (600,600)])
+
+        matrix = cv2.getPerspectiveTransform(pts1, pts2)
+        transformed_img = cv2.warpPerspective(img, matrix, (600,600))
+
+        if SHOW_IMAGES:
+            cv2.imshow("After transformation", transformed_img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+        return transformed_img
 
     def get_circle_center(self, img):
         # convert image to gray scale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
-
         gray_blurred = cv2.blur(gray, (3, 3))
 
         kernel = np.ones((5,5),np.uint8)
         eroded_img = cv2.morphologyEx(gray_blurred, cv2.MORPH_OPEN, kernel)
 
-        detected_circles = cv2.HoughCircles(image = eroded_img,  
+        detected_circles = cv2.HoughCircles(image = gray_blurred,  
                                             method = cv2.HOUGH_GRADIENT, 
-                                            dp = 1.2, 
-                                            minDist = 200, 
-                                            param1 = 50, 
-                                            param2 = 30, 
-                                            minRadius = 180, 
-                                            maxRadius = 220)
+                                            dp = 1, 
+                                            minDist = 50, 
+                                            param1 = 100, 
+                                            param2 = 10, 
+                                            minRadius = 10, 
+                                            maxRadius = 500)
         
         if detected_circles is not None:
             if len(detected_circles) > 1:
@@ -67,11 +107,20 @@ class AngleDetector():
 
             for x, y, r in detected_circles[0, :]:
                 logger.info(f"Circle detected on image with center point ({x}, {y})")
+
+                if SHOW_IMAGES:
+                    temp_img = img
+                    cv2.circle(temp_img, (x, y), r, 70, thickness=5)
+
+                    cv2.imshow("Detected Circle", temp_img)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+
                 return (x, y)
         else:
             raise Exception("No circle found")
 
-    def get_edge_points(self, img):
+    def get_edge_points(self, img, circle_center):
         white_edge_pixles = [] # all white edge pixles
         height, width, _ = img.shape # image size
 
@@ -99,17 +148,19 @@ class AngleDetector():
             if binary[y, width - 1] == 255:  # right
                 white_edge_pixles.append((width - 1, y))
 
+        print(white_edge_pixles)
+
         if len(white_edge_pixles) > 1:
-            # Elbow-Methode zur Bestimmung der optimalen Anzahl von Clustern
+            #cluster_centers = self.testi(white_edge_pixles, circle_center)
             sse = []
-            for k in range(1, min(6, len(white_edge_pixles))):  # K zwischen 1 und 5 (oder len(edge_points))
+            for k in range(1, min(5, len(white_edge_pixles))):
                 kmeans = KMeans(n_clusters=k, n_init=10).fit(white_edge_pixles)
-                sse.append(kmeans.inertia_)  # Summe der quadrierten Fehler
+                sse.append(kmeans.inertia_)
 
             deltas = np.diff(sse)
-            k_optimal = np.argmax(deltas) + 1  # Index + 1
+            k_optimal = np.argmax(deltas) + 1
 
-            kmeans = KMeans(n_clusters=k_optimal, n_init=10).fit(white_edge_pixles)
+            kmeans = KMeans(n_clusters=k_optimal, n_init=20, max_iter=300, tol=1e-6, init='k-means++',).fit(white_edge_pixles)
             cluster_centers = kmeans.cluster_centers_.astype(int)
         else:
             cluster_centers = white_edge_pixles
@@ -123,41 +174,6 @@ class AngleDetector():
             edge_points = white_edge_pixles
 
         return edge_points
-
-    def transform_img(self, img):
-        # coordinates to transform
-        tl = (900,1300)
-        bl = (400, 1900)
-        tr = (1700,1300)
-        br = (2200,1900)
-
-        if self.test_mode:
-            cv2.circle(img, tl, 5, (0,0,255), -1)
-            cv2.circle(img, bl, 5, (0,0,255), -1)
-            cv2.circle(img, tr, 5, (0,0,255), -1)
-            cv2.circle(img, br, 5, (0,0,255), -1)
-
-            # Bildgröße reduzieren (Skalierungsfaktor anpassen)
-            scale_percent = 10  # Beispiel: 50% der Originalgröße
-            width = int(img.shape[1] * scale_percent / 100)
-            height = int(img.shape[0] * scale_percent / 100)
-            dim = (width, height)
-
-            # Bild skalieren
-            resized_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-
-            cv2.imshow("Gefundene Randpunkte & Winkel", resized_img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-        
-        # transform image
-        pts1 = np.float32([tl, bl, tr, br])
-        pts2 = np.float32([(0,0), (0,600), (600,0), (600,600)])
-
-        matrix = cv2.getPerspectiveTransform(pts1, pts2)
-        transformed_img = cv2.warpPerspective(img, matrix, (600,600))
-
-        return transformed_img
     
     def calculate_angle(self, circle_center, edge_point):
         delta_y = edge_point[1] - circle_center[1]
@@ -170,3 +186,58 @@ class AngleDetector():
         logger.info(f"Found line on waypoint with angle: {angle_deg}")
 
         return angle_deg
+    
+    def testi(self, white_edge_points, circle_center):
+        linien_toleranz_winkel = 5  # Toleranz für den Winkel zwischen Linien (in Grad)
+        linien_toleranz_abstand = 10
+
+        gruppen = defaultdict(list)
+        zugeordnete = set()
+
+        for i, punkt1 in enumerate(white_edge_points):
+            if i in zugeordnete:
+                continue
+            
+            winkel1 = self.calculate_angle(circle_center, punkt1)
+            neue_gruppe = [punkt1]
+            zugeordnete.add(i)
+            gruppen[winkel1].append(punkt1)
+
+            for j in range(i + 1, len(white_edge_points)):
+                if j not in zugeordnete:
+                    punkt2 = white_edge_points[j]
+                    winkel2 = self.calculate_angle(circle_center, punkt2)
+
+                    winkel_differenz = min(abs(winkel1 - winkel2), 360 - abs(winkel1 - winkel2))
+
+                    if winkel_differenz < linien_toleranz_winkel:
+                        # Prüfe zusätzlich auf räumliche Nähe, um sicherzustellen, dass es sich um die gleiche Linie handelt
+                        distanz = np.sqrt((punkt1[0] - punkt2[0])**2 + (punkt1[1] - punkt2[1])**2)
+                        if distanz < 20: # Passe diesen Wert nach Bedarf an
+                            gruppen[winkel1].append(punkt2)
+                            zugeordnete.add(j)
+
+        # Zusammenführen von Gruppen mit sehr ähnlichen Winkeln
+        final_gruppen = defaultdict(list)
+        zugeordnete_winkel = set()
+        for winkel1, gruppe1 in gruppen.items():
+            if winkel1 in zugeordnete_winkel:
+                continue
+            final_gruppen[winkel1].extend(gruppe1)
+            zugeordnete_winkel.add(winkel1)
+            for winkel2, gruppe2 in gruppen.items():
+                if winkel2 != winkel1 and winkel2 not in zugeordnete_winkel:
+                    winkel_differenz = min(abs(winkel1 - winkel2), 360 - abs(winkel1 - winkel2))
+                    if winkel_differenz < linien_toleranz_winkel * 1.5: # Etwas größere Toleranz beim Mergen
+                        final_gruppen[winkel1].extend(gruppe2)
+                        zugeordnete_winkel.add(winkel2)
+
+        mittlere_punkte = []
+        for gruppe in final_gruppen.values():
+            if gruppe:
+                koordinaten = np.array(gruppe)
+                mittel_x = int(np.mean(koordinaten[:, 0]))
+                mittel_y = int(np.mean(koordinaten[:, 1]))
+                mittlere_punkte.append((mittel_x, mittel_y))
+
+        return mittlere_punkte
