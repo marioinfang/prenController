@@ -85,6 +85,7 @@ class VehicleControlCLI(cmd.Cmd):
         print("  drive 3 false 100 | drive <state:int> <blocked:bool> <distance:int> — Send drive command")
         print("  stop 3 3 | stop <state:int> <reason:int> — Send stop command with reason (1=WAYPOINT, 2=CONE, 3=OBSTACLE, 4=PATH)")
         print("  rotate 3 0 90 | rotate <state:int> <direction:0|1> <angle:int> — Send rotate command (0=LEFT, 1=RIGHT)")
+        print("  waypoint 3 | to_waypoint <state:int> — Drive to waypoint")
 
 if __name__ == '__main__':
     VehicleControlCLI().cmdloop()
