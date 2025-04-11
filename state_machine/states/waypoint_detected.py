@@ -16,7 +16,7 @@ class WaypointDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
-        self.angle_detecor = AngleDetector(False)
+        self.angle_detecor = AngleDetector()
 
     def context(self):
         logger.info("Entered State: WaypointDetected")

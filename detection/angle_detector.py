@@ -10,8 +10,8 @@ SHOW_IMAGES = False
 
 class AngleDetector():
 
-    def __init__(self, test_mode: False):
-        self.test_mode = test_mode
+    def __init__(self):
+        logger.debug("AngleDetector inizialised")
 
     def get_angles(self, img):
         angles = []
@@ -22,22 +22,24 @@ class AngleDetector():
 
         edge_points = self.get_edge_points(transformed_img, circle_center)
 
+        temp_img = transformed_img
         for edge_point in edge_points:
             angles.append(self.calculate_angle(circle_center, edge_point))
 
-            if self.test_mode:
-                cv2.circle(transformed_img, (edge_point[0], edge_point[1]), 5, (0, 0, 255), -1)  # draw edge point on image
-                cv2.line(transformed_img, circle_center, (edge_point[0], edge_point[1]), (255, 0, 0), 2)  # draw blue line
-                cv2.putText(transformed_img, str(round(self.calculate_angle(circle_center, edge_point))),(edge_point[0], edge_point[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+            if SHOW_IMAGES:
+                cv2.circle(temp_img, (edge_point[0], edge_point[1]), 5, (0, 0, 255), -1)  # draw edge point on image
+                cv2.line(temp_img, circle_center, (edge_point[0], edge_point[1]), (255, 0, 0), 2)  # draw blue line
+                cv2.putText(temp_img, str(round(self.calculate_angle(circle_center, edge_point))),(edge_point[0], edge_point[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
         
+        if SHOW_IMAGES:
+            cv2.imshow("Found angles", temp_img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
         # map smalest angle to 0
         distance_to_0 = np.abs(np.array(angles) - 0)
         distance_to_360 = np.abs(np.array(angles) - 360)
         angles[np.argmin(np.minimum(distance_to_0, distance_to_360))] = 0
-
-        cv2.imshow("Gefundene Randpunkte & Winkel", transformed_img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
         return angles
     
@@ -130,9 +132,10 @@ class AngleDetector():
         # turns ever pixel black except defined range
         _, binary = cv2.threshold(gray_img, 200, 255, cv2.THRESH_BINARY)
 
-        cv2.imshow("Gefundene Randpunkte & Winkel", binary)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        if SHOW_IMAGES:
+            cv2.imshow("Blacked picure", binary)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
         # search for white pixels on top and bottom image line
         for x in range(width):
@@ -148,10 +151,7 @@ class AngleDetector():
             if binary[y, width - 1] == 255:  # right
                 white_edge_pixles.append((width - 1, y))
 
-        print(white_edge_pixles)
-
         if len(white_edge_pixles) > 1:
-            #cluster_centers = self.testi(white_edge_pixles, circle_center)
             sse = []
             for k in range(1, min(5, len(white_edge_pixles))):
                 kmeans = KMeans(n_clusters=k, n_init=10).fit(white_edge_pixles)
@@ -166,14 +166,6 @@ class AngleDetector():
             cluster_centers = white_edge_pixles
 
         return cluster_centers
-
-        if len(white_edge_pixles) > 1:
-            kmeans = KMeans(n_clusters=min(5, len(white_edge_pixles)), n_init=10).fit(white_edge_pixles)
-            edge_points = kmeans.cluster_centers_.astype(int)
-        else:
-            edge_points = white_edge_pixles
-
-        return edge_points
     
     def calculate_angle(self, circle_center, edge_point):
         delta_y = edge_point[1] - circle_center[1]
@@ -186,58 +178,3 @@ class AngleDetector():
         logger.info(f"Found line on waypoint with angle: {angle_deg}")
 
         return angle_deg
-    
-    def testi(self, white_edge_points, circle_center):
-        linien_toleranz_winkel = 5  # Toleranz für den Winkel zwischen Linien (in Grad)
-        linien_toleranz_abstand = 10
-
-        gruppen = defaultdict(list)
-        zugeordnete = set()
-
-        for i, punkt1 in enumerate(white_edge_points):
-            if i in zugeordnete:
-                continue
-            
-            winkel1 = self.calculate_angle(circle_center, punkt1)
-            neue_gruppe = [punkt1]
-            zugeordnete.add(i)
-            gruppen[winkel1].append(punkt1)
-
-            for j in range(i + 1, len(white_edge_points)):
-                if j not in zugeordnete:
-                    punkt2 = white_edge_points[j]
-                    winkel2 = self.calculate_angle(circle_center, punkt2)
-
-                    winkel_differenz = min(abs(winkel1 - winkel2), 360 - abs(winkel1 - winkel2))
-
-                    if winkel_differenz < linien_toleranz_winkel:
-                        # Prüfe zusätzlich auf räumliche Nähe, um sicherzustellen, dass es sich um die gleiche Linie handelt
-                        distanz = np.sqrt((punkt1[0] - punkt2[0])**2 + (punkt1[1] - punkt2[1])**2)
-                        if distanz < 20: # Passe diesen Wert nach Bedarf an
-                            gruppen[winkel1].append(punkt2)
-                            zugeordnete.add(j)
-
-        # Zusammenführen von Gruppen mit sehr ähnlichen Winkeln
-        final_gruppen = defaultdict(list)
-        zugeordnete_winkel = set()
-        for winkel1, gruppe1 in gruppen.items():
-            if winkel1 in zugeordnete_winkel:
-                continue
-            final_gruppen[winkel1].extend(gruppe1)
-            zugeordnete_winkel.add(winkel1)
-            for winkel2, gruppe2 in gruppen.items():
-                if winkel2 != winkel1 and winkel2 not in zugeordnete_winkel:
-                    winkel_differenz = min(abs(winkel1 - winkel2), 360 - abs(winkel1 - winkel2))
-                    if winkel_differenz < linien_toleranz_winkel * 1.5: # Etwas größere Toleranz beim Mergen
-                        final_gruppen[winkel1].extend(gruppe2)
-                        zugeordnete_winkel.add(winkel2)
-
-        mittlere_punkte = []
-        for gruppe in final_gruppen.values():
-            if gruppe:
-                koordinaten = np.array(gruppe)
-                mittel_x = int(np.mean(koordinaten[:, 0]))
-                mittel_y = int(np.mean(koordinaten[:, 1]))
-                mittlere_punkte.append((mittel_x, mittel_y))
-
-        return mittlere_punkte
