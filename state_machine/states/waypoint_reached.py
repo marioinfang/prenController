@@ -20,7 +20,7 @@ class WaypointReached(BaseState):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
         self.button_service = ButtonService.get_instance()
-        self.line_analyzer = PathAnalyzer("model/best.onnx")
+        self.line_analyzer = PathAnalyzer("detection/model/best.onnx")
         self.angles = angles
 
     def context(self):
@@ -67,7 +67,7 @@ class WaypointReached(BaseState):
     def _find_line(self):
         sorted_angles = sorted(self.angles)
 
-        for angle in sorted_angles[:-1]:
+        for angle in sorted_angles[1:]:
             self.vehicle_control_service.rotate(Decision.WAYPOINT_REACHED, DirectionType.RIGHT, angle)
 
             if self._is_driveable_line():

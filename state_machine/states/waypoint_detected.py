@@ -36,12 +36,12 @@ class WaypointDetected(BaseState):
         Placeholder for real decision-making logic.
         If not overridden in tests, use random decision.
         """
-        if is_raspberry_pi:
+        if is_raspberry_pi():
             from camera.pi_camera import PiCamera
             img = PiCamera().take_picture()
         else:
             import cv2
-            img = cv2.imread("../input/images/test_image_c_flipped.jpeg")
+            img = cv2.imread("state_machine/input/images/testKreis30.png")
         
         angles = self.angle_detecor.get_angles(img)
         self.machine.set_data(angles)
