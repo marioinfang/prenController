@@ -6,7 +6,6 @@ from vehicle_control.types.direction_type import DirectionType
 from vehicle_control.vehicle_control_service import VehicleControlService
 from .base_state import BaseState
 from .error import Error
-from ..input.button_service import ButtonService
 
 logger = get_logger(__name__)
 
@@ -15,7 +14,6 @@ class WaypointReached(BaseState):
     def __init__(self, machine):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
-        self.button_service = ButtonService.get_instance()
 
     def context(self):
         logger.info("Entered State: WaypointReached")
@@ -38,21 +36,5 @@ class WaypointReached(BaseState):
 
 
     def get_decision(self):
-        if self._is_destination_waypoint():
-            return Decision.FINISH_LINE_REACHED
-        else:
-            return Decision.FOLLOW_LINE
+        return Decision.FOLLOW_LINE
 
-    def _is_destination_waypoint(self):
-        logger.info("Checking whether the waypoint is our destination state")
-        destination = self.button_service.get_selected_destination()
-        logger.info(f"Our destination is {destination}")
-
-        logger.info("Processing Image")
-        #result = process_image("../input/images/test_image_c_flipped.jpeg")
-        result = True
-        logger.info(f"Image result: {result}")
-        if destination == result:
-            return True
-        else:
-            return False
