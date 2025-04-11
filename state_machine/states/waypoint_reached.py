@@ -9,7 +9,6 @@ from vehicle_control.vehicle_control_service import VehicleControlService
 from detection.path_analyzer import PathAnalyzer
 from .base_state import BaseState
 from .error import Error
-from ..input.button_service import ButtonService
 from utils.raspberry_checker import is_raspberry_pi
 
 logger = get_logger(__name__)
@@ -19,7 +18,6 @@ class WaypointReached(BaseState):
     def __init__(self, machine, angles):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
-        self.button_service = ButtonService.get_instance()
         self.line_analyzer = PathAnalyzer("detection/model/best.onnx")
         self.angles = angles
 
@@ -44,25 +42,8 @@ class WaypointReached(BaseState):
 
 
     def get_decision(self):
-        if self._is_destination_waypoint():
-            return Decision.FINISH_LINE_REACHED
-        else:
             self._find_line()
             return Decision.FOLLOW_LINE
-
-    def _is_destination_waypoint(self):
-        logger.info("Checking whether the waypoint is our destination state")
-        destination = self.button_service.get_selected_destination()
-        logger.info(f"Our destination is {destination}")
-
-        logger.info("Processing Image")
-        #result = process_image("../input/images/test_image_c_flipped.jpeg")
-        result = True
-        logger.info(f"Image result: {result}")
-        if destination == result:
-            return True
-        else:
-            return False
         
     def _find_line(self):
         sorted_angles = sorted(self.angles)
@@ -86,3 +67,5 @@ class WaypointReached(BaseState):
             return not is_cone_on_line
 
         return random.choice([True, False])
+        return Decision.FOLLOW_LINE
+
