@@ -51,7 +51,7 @@ class WaypointDetected(BaseState):
             import cv2
             img = cv2.imread("state_machine/input/images/testKreis30.png")
 
-        if self._is_destination_waypoint(img):
+        if self._is_destination_waypoint(self.angle_detecor.transform_img(img)):
             return Decision.FINISH_LINE_REACHED
 
         angles = self.angle_detecor.get_angles(img)

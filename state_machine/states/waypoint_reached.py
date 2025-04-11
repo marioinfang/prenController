@@ -29,12 +29,7 @@ class WaypointReached(BaseState):
 
             decision = self.get_decision()
 
-            if decision == Decision.FINISH_LINE_REACHED:
-                from .finish_line_reached import FinishLineReached
-                self.vehicle_control_service.stop(Decision.FINISH_LINE_REACHED, StopTypes.WAYPOINT)
-                self.machine.set_state(FinishLineReached(self.machine))
-            elif decision == Decision.FOLLOW_LINE:
-                self.vehicle_control_service.rotate(Decision.WAYPOINT_REACHED, DirectionType.LEFT, 65)
+            if decision == Decision.FOLLOW_LINE:
                 from .follow_line import FollowLine
                 self.machine.set_state(FollowLine(self.machine))
         except CommandExecutionError:
