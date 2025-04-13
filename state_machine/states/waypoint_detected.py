@@ -4,7 +4,7 @@ from state_machine.types.decision_state import Decision
 from utils.log_config import get_logger
 from vehicle_control.exceptions.command_execution_exception import CommandExecutionError
 from vehicle_control.vehicle_control_service import VehicleControlService
-from detection.angle_detector import AngleDetector
+from detection.angle_service import AngleService
 from .base_state import BaseState
 from .error import Error
 from utils.raspberry_checker import is_raspberry_pi
@@ -18,7 +18,7 @@ class WaypointDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
-        self.angle_detecor = AngleDetector()
+        self.angle_service = AngleService()
         self.button_service = ButtonService.get_instance()
 
 
@@ -53,8 +53,8 @@ class WaypointDetected(BaseState):
 
         if self._is_destination_waypoint(self.angle_detecor.transform_img(img)):
             return Decision.FINISH_LINE_REACHED
-
-        angles = self.angle_detecor.get_angles(img)
+        
+        angles = self.angle_service.get_angles_of_waypoint(img)
 
         return Decision.WAYPOINT_REACHED, angles
 
@@ -64,7 +64,7 @@ class WaypointDetected(BaseState):
         logger.info(f"Our destination is {destination}")
 
         logger.info("Processing Image")
-        result = scan_node(img);
+        result = scan_node(img)
         logger.info(f"Image result: {result}")
         if destination == result:
             return True

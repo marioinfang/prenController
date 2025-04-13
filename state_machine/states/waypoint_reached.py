@@ -25,8 +25,6 @@ class WaypointReached(BaseState):
         logger.info("Entered State: WaypointReached")
 
         try:
-            "missing logic"
-
             decision = self.get_decision()
 
             if decision == Decision.FOLLOW_LINE:
@@ -62,5 +60,4 @@ class WaypointReached(BaseState):
             return not is_cone_on_line
 
         return random.choice([True, False])
-        return Decision.FOLLOW_LINE
 
