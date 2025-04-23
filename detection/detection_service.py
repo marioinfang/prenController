@@ -1,5 +1,5 @@
 from detection.yolo_detector import YoloDetector
-from detection.pi_camera import PiCamera
+from camera.pi_camera import PiCamera
 
 class DetectionService:
     def __init__(self, model_path="detection/model/best.onnx"):
@@ -12,7 +12,10 @@ class DetectionService:
         self.last_results = self.yolo_detector.detect_objects(img)
         return self.last_results
 
-    # Returns the last detected objects as a list of dictionaries
+    def detect_from_image(self, img):
+        self.last_results = self.yolo_detector.detect_objects(img)
+        return self.last_results
+
     def get_detected_objects(self):
         detected_objects = []
         for result in self.last_results:
@@ -26,22 +29,31 @@ class DetectionService:
                 })
         return detected_objects
 
-    def is_object_detected(self, object_name):
-        return any(obj["name"] == object_name for obj in self.get_detected_objects())
+    def get_object_in_path(self, image_width=640, x_tolerance=50):
+        """
+        Gibt das Objekt zurück, das sich auf der vertikalen Linie direkt vor dem Fahrzeug befindet.
+        x_tolerance definiert, wie weit es seitlich von der Bildmitte (X-Achse) abweichen darf.
+        Das Objekt mit der größten unteren Y-Koordinate (am nächsten zur Kamera) wird gewählt.
+        """
+        center_x = image_width // 2
+        closest_obj = None
+        max_y = -1 
 
-    def get_distance_to_nearest_object(self, object_name=None):
-        min_distance = float("inf")
-        closest_object = None
+        for result in self.last_results:
+            for box in result.boxes:
+                x1, y1, x2, y2 = box.xyxy[0]
+                object_center_x = (x1 + x2) / 2
 
-        for obj in self.get_detected_objects():
-            if object_name is None or obj["name"] == object_name:
-                distance = self._get_distance_to_object(obj["box"])
-                if distance < min_distance:
-                    min_distance = distance
-                    closest_object = obj["name"]
+                if abs(object_center_x - center_x) <= x_tolerance:
+                    if y2 > max_y:
+                        max_y = y2
+                        object_class_id = int(box.cls[0])
+                        object_name = self.yolo_detector.object_names[object_class_id]
+                        closest_obj = {
+                            "name": object_name,
+                            "confidence": float(box.conf[0]),
+                            "box": box.xyxy[0].tolist(),
+                            "distance_from_bottom": y2
+                        }
 
-        return min_distance if min_distance != float("inf") else -1, closest_object
-
-    def _get_distance_to_object(self, box_coordinates):
-        _, y1, _, y2 = map(int, box_coordinates)
-        return y2
+        return closest_obj
