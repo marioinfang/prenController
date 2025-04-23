@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 
 class YoloDetector:
-    def __init__(self, model_path="model/best.onnx"):
+    def __init__(self, model_path="detection/model/best.onnx"):
         self.model = YOLO(model_path)
         self.object_names = self.model.names
     

@@ -4,8 +4,12 @@ from state_machine.types.decision_state import Decision
 from utils.log_config import get_logger
 from vehicle_control.exceptions.command_execution_exception import CommandExecutionError
 from vehicle_control.vehicle_control_service import VehicleControlService
+from detection.angle_detector import AngleDetector
 from .base_state import BaseState
 from .error import Error
+from utils.raspberry_checker import is_raspberry_pi
+from ..input.button_service import ButtonService
+from ..input.character_recognition_service import scan_node
 
 logger = get_logger(__name__)
 
@@ -14,17 +18,23 @@ class WaypointDetected(BaseState):
     def __init__(self, machine):
         self.machine = machine
         self.vehicle_control_service = VehicleControlService()
+        self.angle_detecor = AngleDetector()
+        self.button_service = ButtonService.get_instance()
+
 
     def context(self):
         logger.info("Entered State: WaypointDetected")
         try:
-            self.vehicle_control_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
+            decision, angles = self.get_decision()
 
-            decision = self.get_decision()
+            self.vehicle_control_service.drive_to_waypoint(state=Decision.WAYPOINT_DETECTED)
 
             if decision == Decision.WAYPOINT_REACHED:
                 from .waypoint_reached import WaypointReached
-                self.machine.set_state(WaypointReached(self.machine))
+                self.machine.set_state(WaypointReached(self.machine, angles))
+            if decision == Decision.FINISH_LINE_REACHED:
+                from .finish_line_reached import FinishLineReached
+                self.machine.set_state(FinishLineReached(self.machine))
         except CommandExecutionError:
             self.machine.set_state(Error(self.machine))
 
@@ -33,6 +43,30 @@ class WaypointDetected(BaseState):
         Placeholder for real decision-making logic.
         If not overridden in tests, use random decision.
         """
-        return random.choice([
-            Decision.WAYPOINT_REACHED
-        ])
+        
+        if is_raspberry_pi():
+            from camera.pi_camera import PiCamera
+            img = PiCamera().take_picture()
+        else:
+            import cv2
+            img = cv2.imread("state_machine/input/images/testKreis30.png")
+
+        if self._is_destination_waypoint(self.angle_detecor.transform_img(img)):
+            return Decision.FINISH_LINE_REACHED
+
+        angles = self.angle_detecor.get_angles(img)
+
+        return Decision.WAYPOINT_REACHED, angles
+
+    def _is_destination_waypoint(self, img):
+        logger.info("Checking whether the waypoint is our destination state")
+        destination = self.button_service.get_selected_destination()
+        logger.info(f"Our destination is {destination}")
+
+        logger.info("Processing Image")
+        result = scan_node(img);
+        logger.info(f"Image result: {result}")
+        if destination == result:
+            return True
+        else:
+            return False
