@@ -1,11 +1,19 @@
 from detection.yolo_detector import YoloDetector
-from camera.pi_camera import PiCamera
+# from camera.pi_camera import PiCamera
 
 class DetectionService:
-    def __init__(self, model_path="detection/model/best.onnx"):
+    def __init__(self, model_path="detection/model/best.onnx", use_camera=True):
         self.yolo_detector = YoloDetector(model_path)
-        self.camera = PiCamera()
+        self.camera = None
         self.last_results = []
+
+        if use_camera:
+            try:
+                from camera.pi_camera import PiCamera
+                self.camera = PiCamera()
+            except ImportError:
+                print("Kamera-Modul konnte nicht geladen werden (wahrscheinlich kein Raspberry Pi).")
+
 
     def capture_and_detect(self):
         img = self.camera.take_picture()
