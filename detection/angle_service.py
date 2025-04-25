@@ -53,6 +53,12 @@ class AngleService():
         # Claclulate the relative angles
         sorted_angles = angles.sort()
 
+        differences = []
+        for i in range(1, len(angles)):
+            difference = (sorted_angles[i] - sorted_angles[i - 1]) % 360
+            differences.append(difference)
+             
+        logger.info(f"Translated angles into differences {differences}")
 
         return angles
     
