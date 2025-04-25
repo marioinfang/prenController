@@ -8,7 +8,7 @@ logger = get_logger(__name__)
 class PiCamera:
     def __init__(self):
         self.camera = Picamera2()
-        config = self.camera.create_still_configuration(main={"size": (640, 480)})
+        config = self.camera.create_still_configuration(main={"size": (2592, 1944)})
         self.camera.configure(config)
         self.camera.start()
     
@@ -16,10 +16,7 @@ class PiCamera:
         raw_img = self.camera.capture_array() # take picture
         logger.info("Took image")
 
-        img = cv2.rotate(raw_img, cv2.ROTATE_180)
-        
-        # rezie picture to trained model size
-        img = cv2.resize(img, (640, 640), interpolation=cv2.INTER_LINEAR)
+        img = cv2.rotate(raw_img, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
         # convertion from BGR to RGB
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

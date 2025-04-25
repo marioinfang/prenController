@@ -9,6 +9,7 @@ logger = get_logger(__name__)
 detector = AngleService() 
 
 def run_detecor():
+    angles = None
     if is_raspberry_pi():
         from camera.pi_camera import PiCamera
         camera = PiCamera()
@@ -24,7 +25,7 @@ def run_detecor():
 
             input("Drücke Enter für die nächste Berechnung...")
     else:
-        img = cv2.imread("C:/Users/minfang/Downloads/testi1.png")
+        img = cv2.imread("C:/Users/minfang/Downloads/teeeeeeeest.png")
 
         try:
             angles = detector.get_angles_of_waypoint(img)
