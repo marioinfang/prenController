@@ -18,8 +18,8 @@ def run_detecor():
             img = camera.take_picture()
             try:
                 angles = detector.get_angles_of_waypoint(img)
-            except Exception:
-                logger.error("No cyrcle detected!")
+            except Exception as e:
+                logger.error(f"No cyrcle detected! Error: {e}")
             
             logger.info(f"Detected angles: {angles}")
 

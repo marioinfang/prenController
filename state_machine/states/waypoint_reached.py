@@ -39,9 +39,7 @@ class WaypointReached(BaseState):
             return Decision.FOLLOW_LINE
         
     def _find_line(self):
-        sorted_angles = sorted(self.angles)
-
-        for angle in sorted_angles[1:]:
+        for angle in self.angles[:-1]:
             self.vehicle_control_service.rotate(Decision.WAYPOINT_REACHED, DirectionType.RIGHT, angle)
 
             if self._is_driveable_line():
@@ -49,7 +47,7 @@ class WaypointReached(BaseState):
                 return
 
         logger.info("No drivable line was found! Rotade to initial line.")
-        self.vehicle_control_service.rotate(Decision.WAYPOINT_REACHED, DirectionType.RIGHT, sorted_angles[-1])
+        self.vehicle_control_service.rotate(Decision.WAYPOINT_REACHED, DirectionType.RIGHT, self.angles[-1])
 
 
     def _is_driveable_line(self):

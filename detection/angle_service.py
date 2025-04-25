@@ -51,16 +51,19 @@ class AngleService():
         angles[np.argmin(np.minimum(distance_to_0, distance_to_360))] = 0
 
         # Claclulate the relative angles
-        sorted_angles = angles.sort()
+        sorted_angles = sorted(angles)
 
         differences = []
         for i in range(1, len(angles)):
             difference = (sorted_angles[i] - sorted_angles[i - 1]) % 360
             differences.append(difference)
+
+        wrap_around_diff = (sorted_angles[0] - sorted_angles[-1]) % 360
+        differences.append(wrap_around_diff)
              
         logger.info(f"Translated angles into differences {differences}")
 
-        return angles
+        return differences
     
     def _transform_img(self, img):
         """
