@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 
 class UARTHandler:
     _instance = None
-    def __init__(self, port: str = "/dev/serial0", baudrate: int = 115200, timeout: float = 2):
+    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200, timeout: float = 2):
         if UARTHandler._instance is not None:
             raise Exception("Use get_instance() to access UARTHandler.")
         self.port = port
