@@ -61,6 +61,14 @@ class VehicleControlCLI(cmd.Cmd):
         self.service.start_listen()
         print("🟢 Listening started...")
 
+    def do_command(self, arg):
+        "command <string> — Send raw UART command string"
+        try:
+            self.service._send_command(arg)
+            print(f"📤 Command sent: {arg}")
+        except Exception as e:
+            print(f"❌ Error sending command: {e}")
+
     def do_unlisten(self, _):
         "unlisten — Stop UART listening mode"
         self.service.stop_listen()
