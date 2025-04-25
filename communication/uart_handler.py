@@ -36,7 +36,9 @@ class UARTHandler:
             raise ConnectionError("UART connection is not open!")
         try:
             logger.info(f"Sending: {data}")
-            self.serial_conn.write(data.encode('utf-8'))
+            data_to_send = data.encode('utf-8')
+            logger.info(data_to_send)
+            self.serial_conn.write(data_to_send)
             self.serial_conn.flush()
         except serial.SerialException as e:
             raise ConnectionError(f"Failed to send data: {e}")
