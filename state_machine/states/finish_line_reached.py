@@ -1,3 +1,4 @@
+from audio.audio_player import play_target_reached
 from utils.log_config import get_logger
 from .base_state import BaseState
 
@@ -10,5 +11,5 @@ class FinishLineReached(BaseState):
 
     def context(self):
         logger.info("Entered State: FinishLineReached")
-        # TODO add piepser
+        play_target_reached()
         "missing logic"
