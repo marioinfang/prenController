@@ -13,10 +13,10 @@ class VehicleControlService:
 
     def drive(self, state: Decision, blocked: bool, distance: int) -> None:
         #self._send_command(f"drive({state},{blocked},{distance})")
-        self._send_command("T 40 50")
+        self._send_command("T 40 50") # T distance speed
 
     def stop(self, state: Decision, reason: StopTypes) -> None:
-        #self._send_command(f"stop({state},{reason})")
+        #self._send_command(f"stop({state},{reason})") # STOP 0 0
         self._send_command(f"stop({state},{reason})")
 
     def drive_to_waypoint(self, state: Decision) -> None:
@@ -25,6 +25,11 @@ class VehicleControlService:
     def rotate(self, state: Decision, direction: DirectionType, angle: int) -> None:
         #self._send_command(f"rotate({state},{direction},{angle})")
         self._send_command(f"CCW 525 50") #90 degrees
+
+    #def move_obstabcle(self, state: Decision, direction: DirectionType, angle: int) -> None:
+        #self._send_command(f"rotate({state},{direction},{angle})")
+        #self._send_command(f"UP 0 1") go up
+        #self._send_command(f"UP 0 -1") go down
 
     #TODO add move obstacle method
 
