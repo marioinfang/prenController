@@ -19,9 +19,9 @@ class FollowLine(BaseState):
     SAFE_DISTANCE = 100
 
     SAFE_DISTANCES = {
-        "cone": 100,
-        "barrier": 30,
-        "waypoint": 30
+        "cone": 200,
+        "barrier": 200,
+        "waypoint": 200
     }
 
     OBJECT_STATES = {
