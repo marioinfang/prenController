@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 
 class UARTHandler:
     _instance = None
-    def __init__(self, port: str = "/dev/serial0", baudrate: int = 115200, timeout: float = 2):
+    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200, timeout: float = 2):
         if UARTHandler._instance is not None:
             raise Exception("Use get_instance() to access UARTHandler.")
         self.port = port
@@ -25,7 +25,10 @@ class UARTHandler:
             self.serial_conn = serial.Serial(
                 port=self.port,
                 baudrate=self.baudrate,
-                timeout=self.timeout
+                timeout=self.timeout,
+                bytesize = serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE
             )
             time.sleep(2)
         except serial.SerialException as e:
@@ -36,7 +39,10 @@ class UARTHandler:
             raise ConnectionError("UART connection is not open!")
         try:
             logger.info(f"Sending: {data}")
-            self.serial_conn.write(data.encode('utf-8'))
+            new_data = data + "\r"
+            data_to_send = new_data.encode('utf-8')
+            logger.info(data_to_send)
+            self.serial_conn.write(data_to_send)
             self.serial_conn.flush()
         except serial.SerialException as e:
             raise ConnectionError(f"Failed to send data: {e}")
