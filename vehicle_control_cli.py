@@ -1,8 +1,12 @@
 import cmd
+
+from detection.angle_detector import AngleDetector
+from utils.raspberry_checker import is_raspberry_pi
 from vehicle_control.vehicle_control_service import VehicleControlService
 from state_machine.types.decision_state import Decision
 from vehicle_control.types.detection_type import StopTypes
 from vehicle_control.types.direction_type import DirectionType
+
 
 class VehicleControlCLI(cmd.Cmd):
     intro = "🚗 Vehicle Control CLI - type 'help' to list commands.\n"
@@ -11,6 +15,7 @@ class VehicleControlCLI(cmd.Cmd):
     def __init__(self):
         super().__init__()
         self.service = VehicleControlService()
+        self.angle_detector = AngleDetector()
 
     def do_drive(self, arg):
         "drive <state:int> <blocked:bool> <distance:int> — Send drive command"
@@ -82,6 +87,19 @@ class VehicleControlCLI(cmd.Cmd):
         else:
             print("⏳ No message received.")
 
+    def do_analyze_waypoint(self, _):
+        "analyze_waypoint — Get angles emerging from waypoint"
+        if is_raspberry_pi():
+            from camera.pi_camera import PiCamera
+            img = PiCamera().take_picture()
+        else:
+            import cv2
+            img = cv2.imread("state_machine/input/images/testKreis30.png")
+
+        angles = self.angle_detector.get_angles(img)
+        print(f"found angles: {angles}")
+
+
     def do_exit(self, _):
         "exit — Exit the CLI"
         print("👋 Exiting.")
@@ -94,6 +112,7 @@ class VehicleControlCLI(cmd.Cmd):
         print("  stop 3 3 | stop <state:int> <reason:int> — Send stop command with reason (1=WAYPOINT, 2=CONE, 3=OBSTACLE, 4=PATH)")
         print("  rotate 3 0 90 | rotate <state:int> <direction:0|1> <angle:int> — Send rotate command (0=LEFT, 1=RIGHT)")
         print("  waypoint 3 | to_waypoint <state:int> — Drive to waypoint")
+        print("  analyze_waypoint — Analyze waypoint angles")
 
 if __name__ == '__main__':
     VehicleControlCLI().cmdloop()
